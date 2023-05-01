@@ -2,6 +2,7 @@ export enum StatusCodes {
 
     //-----  2xx (Successful):
 
+
     SUCCESS = 200,                          // The request has succeeded. The information returned with the response is dependent on the method used in the request
     CREATED = 201,                          // The request has been fulfilled, and a new resource has been created. The new resource is returned in the response.
     ACCEPTED = 202,                         // The request has been accepted for processing, but the processing has not been completed.
