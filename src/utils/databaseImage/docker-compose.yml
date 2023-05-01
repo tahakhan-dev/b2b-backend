@@ -1,0 +1,36 @@
+version: '3'
+services:
+  db_master:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+      POSTGRES_MASTER_USER: postgres
+      POSTGRES_MASTER_PASSWORD: postgres
+      POSTGRES_REPLICATION_USER: replicauser
+      POSTGRES_REPLICATION_PASSWORD: replicapassword
+      POSTGRES_REPLICATION_MODE: master
+    volumes:
+      - ./data/master:/var/lib/postgresql/data
+      - ./create-replication.sh:/docker-entrypoint-initdb.d/create-replication.sh
+    ports:
+      - "5432:5432"
+
+  db_slave:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+      POSTGRES_MASTER_HOST: db_master
+      POSTGRES_REPLICATION_USER: replicauser
+      POSTGRES_REPLICATION_PASSWORD: replicapassword
+      POSTGRES_REPLICATION_MODE: slave
+    volumes:
+      - ./data/slave:/var/lib/postgresql/data
+      - ./create-replication.sh:/docker-entrypoint-initdb.d/create-replication.sh
+    ports:
+      - "5433:5432"
+    depends_on:
+      - db_master
