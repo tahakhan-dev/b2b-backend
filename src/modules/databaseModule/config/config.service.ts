@@ -12,6 +12,7 @@ export class ConfigService {
         data: ConfigData = DEFAULT_CONFIG,
         data2: ConfigData = DEFAULT_CONFIG_2
     ) {
+
         this.config = data;
         this.config2 = data2
     }
