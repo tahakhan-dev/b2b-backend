@@ -2,9 +2,10 @@ import { BaseEntity } from "src/entitiesList/base.entity";
 import { BeforeInsert, Column, Entity } from "typeorm";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { UserRole } from "src/common/enums/user-role";
+import { Exclude } from "class-transformer";
 
 @Entity({ name: 'users' })
-export class User extends BaseEntity {
+export class UserEntity extends BaseEntity {
     @Column({ name: 'user_name', nullable: false, unique: true })
     userName: string;
 
@@ -17,13 +18,14 @@ export class User extends BaseEntity {
     @Column({ name: 'email', nullable: false, unique: true })
     email: string;
 
+    @Exclude()
     @Column({ name: 'password', nullable: false })
     password: string;
 
-    @Column({ name: 'role', enum: UserRole, default: UserRole.USER, nullable: false })
+    @Column({ name: 'role', default: 'user', nullable: false })
     role: UserRole;
 
-    @Column({ name: 'signup_type', enum: UserSignUpType, default: UserSignUpType.CUSTOM, nullable: false })
+    @Column({ name: 'signup_type', default: 'custom', nullable: false })
     signUpType: UserSignUpType;
 
     @Column({ name: 'email_verification', default: false, nullable: false })

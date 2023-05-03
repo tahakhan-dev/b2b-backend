@@ -13,8 +13,11 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+   let ab =  await this.usersService.findAll();
+   console.log(ab,'========ab==========');
+   
+    return ab
   }
 
   @Get(':id')
