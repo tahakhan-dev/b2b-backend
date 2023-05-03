@@ -1,7 +1,7 @@
 import { Module, Scope } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigModule as EnvConfigModule } from '@nestjs/config';
+import { ConfigModule as EnvConfigModule } from '@nestjs/config';
 import { BullModule } from '@nestjs/bull';
 import { DatabaseModule } from './modules/databaseModule/database/database.module';
 import { entitiesList } from './entitiesList/entities.list';
@@ -13,11 +13,10 @@ import { LoggingInterceptor } from './utils/interceptor/logging.interceptor';
 import { HttpExceptionFilter } from './utils/filters/http-exeception.filter';
 import { UsersModule } from './modules/users/users.module';
 
+
 @Module({
   imports: [
-    EnvConfigModule.forRoot(),
-    //DB config
-    ConfigModule,
+    EnvConfigModule.forRoot({ isGlobal: true }),
     // Bull Queue
     BullModule.forRoot({
       redis: {
@@ -28,7 +27,6 @@ import { UsersModule } from './modules/users/users.module';
     BullModule.registerQueue({
       name: 'calculation',
     }),
-
 
     // Module listing
     DatabaseModule.forRoot({ entities: entitiesList }),

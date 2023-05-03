@@ -1,0 +1,36 @@
+users:
+    username  
+    first name
+    last name
+    email
+    user profile image
+    password
+    role
+    signintype
+    email verification
+    otp 
+    phone number
+    is block 
+    is deleted 
+
+user_businesses: 
+    user id
+    business name
+    business type
+    business contact information
+    business description 
+    business locations 
+    headquarters: exact address 
+    business email 
+    business phone number
+    sys id 
+    
+
+separate tables: 
+    interests 
+    invoices
+    chats 
+    searches 
+    
+
+    

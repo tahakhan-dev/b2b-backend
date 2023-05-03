@@ -1,115 +1,100 @@
  STEPS FOR MASTER SLAVE DB REPLICATION 
 =======================================
 
-1.  Create a directory for your project and create a docker-compose.yml file inside it.
-2.  In the docker-compose.yml file, define two services: one for the master database and one for the slave database.
-    Use the official PostgreSQL Docker image for both services. For example:
-
-
------------------------------------------------------------------------------------------------------
-version: '3'
+version: '2.1'
 services:
-  db_master:
-    image: postgres
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
-      POSTGRES_MASTER_USER: myuser
-      POSTGRES_MASTER_PASSWORD: mypassword
-      POSTGRES_REPLICATION_USER: replicauser
-      POSTGRES_REPLICATION_PASSWORD: replicapassword
-      POSTGRES_REPLICATION_MODE: master
-    volumes:
-      - ./data/master:/var/lib/postgresql/data
-      - ./create-replication.sh:/docker-entrypoint-initdb.d/create-replication.sh
+  pg-0:
+    image: docker.io/bitnami/postgresql-repmgr:11
     ports:
-      - "5432:5432"
-
-  db_slave:
-    image: postgres
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
-      POSTGRES_MASTER_HOST: db_master
-      POSTGRES_REPLICATION_USER: replicauser
-      POSTGRES_REPLICATION_PASSWORD: replicapassword
-      POSTGRES_REPLICATION_MODE: slave
+      - 5432
     volumes:
-      - ./data/slave:/var/lib/postgresql/data
-      - ./create-replication.sh:/docker-entrypoint-initdb.d/create-replication.sh
-    depends_on:
-      - db_master
+      - pg_0_data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+      - POSTGRESQL_USERNAME=customuser
+      - POSTGRESQL_PASSWORD=custompassword
+      - POSTGRESQL_DATABASE=customdatabase
+      - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1
+      - REPMGR_PASSWORD=repmgrpassword
+      - REPMGR_PRIMARY_HOST=pg-0
+      - REPMGR_PARTNER_NODES=pg-0,pg-1
+      - REPMGR_NODE_NAME=pg-0
+      - REPMGR_NODE_NETWORK_NAME=pg-0
+  pg-1:
+    image: docker.io/bitnami/postgresql-repmgr:11
+    ports:
+      - 5432
+    volumes:
+      - pg_1_data:/bitnami/postgresql
+    environment:
+      - POSTGRESQL_POSTGRES_PASSWORD=adminpassword
+      - POSTGRESQL_USERNAME=customuser
+      - POSTGRESQL_PASSWORD=custompassword
+      - POSTGRESQL_DATABASE=customdatabase
+      - POSTGRESQL_NUM_SYNCHRONOUS_REPLICAS=1
+      - REPMGR_PASSWORD=repmgrpassword
+      - REPMGR_PRIMARY_HOST=pg-0
+      - REPMGR_PARTNER_NODES=pg-0,pg-1
+      - REPMGR_NODE_NAME=pg-1
+      - REPMGR_NODE_NETWORK_NAME=pg-1
+  pgpool:
+    image: docker.io/bitnami/pgpool:4
+    ports:
+      - 5432:5432
+    environment:
+      - PGPOOL_BACKEND_NODES=0:pg-0:5432,1:pg-1:5432
+      - PGPOOL_SR_CHECK_USER=customuser
+      - PGPOOL_SR_CHECK_PASSWORD=custompassword
+      - PGPOOL_ENABLE_LDAP=no
+      - PGPOOL_POSTGRES_USERNAME=postgres
+      - PGPOOL_POSTGRES_PASSWORD=adminpassword
+      - PGPOOL_ADMIN_USERNAME=admin
+      - PGPOOL_ADMIN_PASSWORD=adminpassword
+      - PGPOOL_ENABLE_LOAD_BALANCING=yes
 
----------------------------------------------------------------------------------------------------
+    healthcheck:
+      test: ["CMD", "/opt/bitnami/scripts/pgpool/healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  pg_0_data:
+    driver: local
+  pg_1_data:
+    driver: local
 
-    In this example, we are passing environment variables to the master or slave database service to configure replication.
-    We are also running a Bash script (create-replication.sh) to set up the replication configuration. 
-    The script should be placed in the same directory as the docker-compose.yml file.
-
-5.  Create the create-replication.sh file in the same directory as the docker-compose.yml file with the following contents:
-
--------------------------------------------------------------------------------------------------------------
-#!/bin/bash
-set -e
+This docker-compose.yml file defines a multi-container application that consists of two PostgreSQL nodes with replication (pg-0 and pg-1) and a Pgpool-II node acting as a load balancer.
 
 
-if [ "$POSTGRES_REPLICATION_MODE" = "master" ]; then
-  echo "Creating replication user and configuring master..."
-  psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE USER $POSTGRES_REPLICATION_USER WITH REPLICATION PASSWORD '$POSTGRES_REPLICATION_PASSWORD';
-    ALTER SYSTEM SET wal_level = 'replica';
-    ALTER SYSTEM SET max_wal_senders = 10;
-    ALTER SYSTEM SET wal_keep_segments = 10;
-    ALTER SYSTEM SET listen_addresses = '*';
-  EOSQL
-  pg_ctl reload
-else
-  echo "Configuring slave replication..."
-  until pg_isready -h "$POSTGRES_MASTER_HOST" -p 5432; do
-    echo "Waiting for master to start..."
-    sleep 1
-  done
-  psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    CREATE USER $POSTGRES_REPLICATION_USER WITH REPLICATION PASSWORD '$POSTGRES_REPLICATION_PASSWORD';
-    SELECT pg_create_physical_replication_slot('$POSTGRES_REPLICATION_USER');
-    SELECT pg_start_replication('$POSTGRES_REPLICATION_USER');
-  EOSQL
-fi
------------------------------------------------------------------------------------------------------------
+1)  version: '2.1' specifies the version of the Docker Compose file format used in this file.
+2)  services section defines three services, each with its own container.
+3)  pg-0 and pg-1 are PostgreSQL nodes with replication using the Bitnami PostgreSQL Replication Manager image. Each node is defined with the following properties:
 
-This bash script is used to configure PostgreSQL replication for a master-slave setup.
-It is executed when the master and slave PostgreSQL containers are started by Docker Compose,
-and it performs different actions depending on the value of the POSTGRES_REPLICATION_MODE environment variable.
+    * image specifies the Docker image to use.
+    * ports specifies the port mappings between the container and the host.
+    * volumes maps the /bitnami/postgresql directory in the container to persistent volumes pg_0_data and pg_1_data on the host file system.
+    * environment sets various environment variables that configure the container, including PostgreSQL and Replication Manager settings such as the username, password, and database name.
 
-Here's a detailed breakdown of what this script does:
+4)  pgpool is a Pgpool-II node acting as a load balancer for the PostgreSQL nodes. It is defined with the following properties:
 
-1.  The first line #!/bin/bash specifies that the script should be executed by the bash shell.
-2.  The set -e option tells the shell to exit immediately if any command in the script exits with a non-zero status
-3.  The if statement checks the value of the POSTGRES_REPLICATION_MODE environment variable. If it is set to "master", 
-    the script executes the following SQL statements:
+    * image specifies the Docker image to use.
+    * ports specifies the port mappings between the container and the host.
+    * environment sets various environment variables that configure the container, including the backend nodes, load balancing, and authentication settings.
+    * healthcheck specifies a health check for the container, using a shell script located at /opt/bitnami/scripts/pgpool/healthcheck.sh.
 
-    *   `CREATE USER $POSTGRES_REPLICATION_USER WITH REPLICATION PASSWORD '$POSTGRES_REPLICATION_PASSWORD';: Creates a replication user with the specified username and password.
-    *   `ALTER SYSTEM SET wal_level = 'replica';: Sets the wal_level configuration parameter to 'replica' to enable WAL (Write Ahead Log) replication.
-    *   `ALTER SYSTEM SET max_wal_senders = 10;: Sets the max_wal_senders configuration parameter to 10 to allow up to 10 replication connections.
-    *   `ALTER SYSTEM SET wal_keep_segments = 10;: Sets the wal_keep_segments configuration parameter to 10 to ensure that the master keeps enough WAL segments to enable replication to catch up
-    *   `ALTER SYSTEM SET listen_addresses = '*';: Sets the listen_addresses configuration parameter to '*' to allow incoming connections from any IP address.
+5)  volumes section defines two volumes used by the PostgreSQL nodes to store their data (pg_0_data and pg_1_data). These volumes are created as Docker-managed volumes with the local driver.
 
-These SQL statements configure the master PostgreSQL server for replication.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-4.  The pg_ctl reload command reloads the PostgreSQL server configuration to apply the changes made in step 3.
-5.  If POSTGRES_REPLICATION_MODE is not set to "master", the script executes the following SQL statements:
+  The extra.conf file is not related to the docker-compose.yml file, but it contains additional PostgreSQL configuration settings:
 
-    *   `CREATE USER $POSTGRES_REPLICATION_USER WITH REPLICATION PASSWORD '$POSTGRES_REPLICATION_PASSWORD';: Creates a replication user with the specified username and password.
-    *   `SELECT pg_create_physical_replication_slot('$POSTGRES_REPLICATION_USER');: Creates a physical replication slot with the specified name
-    *   `SELECT pg_start_replication('$POSTGRES_REPLICATION_USER');: Starts replication using the specified replication slot.
+  *)  log_destination specifies where log messages should be sent (to both syslog and stderr in this case).
+  *)  log_statement enables logging of all SQL statements executed by clients.
+  *)  log_per_node_statement enables logging of SQL statements executed by replication nodes.
+  *)  log_client_messages enables logging of messages sent from clients to the server.
 
-    These SQL statements configure the slave PostgreSQL server for replication.
 
-6.  The until loop waits for the master PostgreSQL server to become available. It runs the pg_isready command to check if the server is ready to accept connections. If the server is not ready,
-    the loop waits for 1 second and tries again.
 
-7.  Once the master PostgreSQL server is available, the script executes the SQL statements in step 5 to configure the slave for replication
 
-    It is an important part of the configuration for a master-slave PostgreSQL replication setup in Docker Compose.
+
+

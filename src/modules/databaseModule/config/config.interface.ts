@@ -8,7 +8,8 @@ export interface ConfigDBData {
     name: string;
     host: string;
     port: number;
-    synchronize: boolean,
+    synchronize?: boolean;
+    autoLoadEntities?: boolean;
     dialect?: string;
     charset?: string;
     collate?: string;
@@ -25,8 +26,6 @@ export interface ConfigData {
 
     /** Database connection details. */
     db?: ConfigDBData;
-
-    db2?: ConfigDBData
 
     /**
      * The log level to use.
