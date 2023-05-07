@@ -1,4 +1,4 @@
-import { CreateUserCommandHandler, LoginUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
+import { CreateUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
 import { UserConditions } from 'src/common/functions/user-condition';
@@ -14,13 +14,14 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
 import 'dotenv/config';
 import { UserValidation } from './functions/user-validation';
+import { UserForgetPasswordCodeEntity } from './entities/user-forgetpassword-verfication.entity';
 
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity]),
-    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity], process.env.CONNECTION_NAME_2),
+    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity]),
+    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity], process.env.CONNECTION_NAME_2),
     AuthModule
   ],
   controllers: [UsersController],
@@ -35,7 +36,8 @@ import { UserValidation } from './functions/user-validation';
     // ---- Command Handler
     CreateUserCommandHandler,
     LoginUserCommandHandler,
-    VerificationLinkUserCommandHandler
+    VerificationLinkUserCommandHandler,
+    ResendForgetPasswordLinkCommandHandler
     //------ Query Handler
     //  ConsumerAccountQueryHandler
   ]

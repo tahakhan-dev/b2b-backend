@@ -1,7 +1,8 @@
 import { BaseEntity } from "src/entitiesList/base.entity";
 import { Column, Entity } from "typeorm";
-@Entity({ name: 'users_verification_code' })
-export class UserVerificationCodeEntity extends BaseEntity {
+
+@Entity({ name: 'users_forgetpassword_code' })
+export class UserForgetPasswordCodeEntity extends BaseEntity {
     @Column({ name: 'user_id', nullable: false })
     userId: number;
 

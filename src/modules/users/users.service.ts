@@ -45,6 +45,12 @@ export class UsersService {
     )
   }
 
+  async resendForgetPasswordLinkUserServiceHandler(verificationLinkUserDto: VerificationLinkUserDto): Promise<IVerificationLinkUser> {
+    return await this.commandBus.execute(
+      new VerificationLinkUserCommand(verificationLinkUserDto)
+    )
+  }
+
   async findAll() {
     // let resp = await this.userRepository.save({
     //   userName: 'tahakhwan2282', email: "t2hakhwan282@gmail.com",

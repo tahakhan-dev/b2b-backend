@@ -37,6 +37,22 @@ export class VerificationLinkUserCommandHandler implements ICommandHandler<Verif
     }
 }
 
+@CommandHandler(VerificationLinkUserCommand)
+export class ResendForgetPasswordLinkCommandHandler implements ICommandHandler<VerificationLinkUserCommand> {
+    constructor(
+        private readonly userRepo: UserRepository,
+        private readonly publisher: EventPublisher,
+    ) { }
+
+    // @ts-ignore
+    async execute(command: VerificationLinkUserCommand, resolve: (value?) => void): Promise<IVerificationLinkUser> {
+        const verificationLink = this.publisher.mergeObjectContext(
+            await this.userRepo.resendForgetPasswordLinkUser(command.verificationLinkUserDto),
+        );
+        return verificationLink;
+    }
+}
+
 
 @CommandHandler(LoginUserCommand)
 export class LoginUserCommandHandler implements ICommandHandler<LoginUserCommand> {

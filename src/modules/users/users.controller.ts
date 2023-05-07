@@ -59,8 +59,23 @@ export class UsersController {
       const VerificationLink = await this.usersService.VerificationLinkUserServiceHandler(verificationLinkUserDto);
       res.status(Number(VerificationLink.StatusCode)).json(VerificationLink)
     } catch (error) {
-      console.log('=======error============== controller', error);
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
 
+  @Post('resend_forgetpassword_link')
+  async resendForgetPasswordLink(@Res() res: Response, @Body() verificationLinkUserDto: VerificationLinkUserDto): Promise<IVerificationLinkUser> {
+
+    try {
+      const VerificationLink = await this.usersService.resendForgetPasswordLinkUserServiceHandler(verificationLinkUserDto);
+      res.status(Number(VerificationLink.StatusCode)).json(VerificationLink)
+    } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
         Status: Status.FAILED,
