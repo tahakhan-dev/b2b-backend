@@ -4,16 +4,9 @@ import { IUserSearchOptionsByUserNameOrEmail } from 'src/interface/conditions/us
 @Injectable()
 export class UserConditions {
 
-    usernameOrEmail(username: string, email: string): IUserSearchOptionsByUserNameOrEmail {
-        return {
-            where: [
-                {
-                    email: email
-                }, {
-                    userName: username
-                }
-            ]
-        }
+    usernameOrEmail(email?: string, userName?: string): IUserSearchOptionsByUserNameOrEmail {
 
+        let condition: IUserSearchOptionsByUserNameOrEmail = email && userName ? { where: [{ email }, { userName }] } : email == undefined ? { where: [{ userName }] } : { where: [{ email }] }
+        return condition
     }
 }

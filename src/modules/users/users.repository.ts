@@ -1,4 +1,4 @@
-import { ICreateUser, ILoginUser } from "./interface/res/user.interface";
+import { ICreateUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
 import { GenerateDigits } from "src/common/functions/generate-digits";
 import { responseHandler } from "src/helpers/response-handler";
 import { StatusCodes } from "../../common/enums/status-codes";
@@ -19,6 +19,8 @@ import { IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/us
 import { SendEmail } from "src/helpers/send-email.helper";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { UserRole } from "src/common/enums/user-role";
+import { VerificationLinkUserDto } from "./dto/verification-link-user.dto";
+import { UserValidation } from "./functions/user-validation";
 
 
 @Injectable()
@@ -34,6 +36,7 @@ export class UserRepository {
         @Inject(GenerateDigits) private readonly randomDigit: GenerateDigits,
         @Inject(UserConditions) private readonly userCondition: UserConditions,
         @Inject(SendEmail) private readonly SendEmailService: SendEmail,
+        @Inject(UserValidation) private readonly UserValidationService: UserValidation
 
     ) { }
 
@@ -42,8 +45,42 @@ export class UserRepository {
         return await this.saveUser(createUserDto);
     }
 
+    async sendVerificationLinkUser(verificationLinkUserDto: VerificationLinkUserDto): Promise<any> {
+        return await this.sendVerificationLink(verificationLinkUserDto);
+    }
+
     async loginUser(loginUserDto: LoginUserDto): Promise<any> {
         return await this.signIn(loginUserDto);
+    }
+
+    private async sendVerificationLink(verificationLinkUserDto: VerificationLinkUserDto): Promise<IVerificationLinkUser> {
+        let response: IVerificationLinkUser, randomNumber: number, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail,
+            getUser: UserEntity, validationError: IVerificationLinkUser, verficationMapper: UserVerificationCodeEntity
+
+        try {
+
+            validationError = this.UserValidationService.verficationLinkValidation(verificationLinkUserDto);
+
+            if (validationError) return validationError
+
+            getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined)
+            getUser = await this.userRepositoryR.findOne(getUserWhereClause);
+
+            validationError = this.UserValidationService.verficationLinkValidation(getUser);
+
+            if (validationError) return validationError
+
+            randomNumber = this.randomDigit.generateRandomDigits(5);
+            verficationMapper = this.mapper.createVerificationObj(getUser.id, randomNumber)
+
+            await this.userVerificationCodeRepositoryW.update({ userId: getUser.id }, { isActive: false, isDeleted: true })
+            await this.userVerificationCodeRepositoryW.save(verficationMapper)
+
+            response = responseHandler(null, "Verfication link send ", Status.SUCCESS, StatusCodes.SUCCESS)
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+        return response;
     }
 
 
@@ -80,7 +117,7 @@ export class UserRepository {
 
         try {
 
-            getUserWhereClause = this.userCondition.usernameOrEmail(createUserDto.userName, createUserDto.email)
+            getUserWhereClause = this.userCondition.usernameOrEmail(createUserDto.email, createUserDto.userName)
 
             getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
@@ -109,7 +146,7 @@ export class UserRepository {
             customMessage = mappedUser && mappedUser.signUpType as UserSignUpType == UserSignUpType.CUSTOM &&
                 mappedUser.role as UserRole != UserRole.ADMIN ? 'Sent You Email For Verification' : 'User Created'
 
-            response = responseHandler(null, customMessage, Status.SUCCESS, StatusCodes.SUCCESS);
+            response = responseHandler(null, customMessage, Status.SUCCESS, StatusCodes.CREATED);
 
 
         } catch (error) {

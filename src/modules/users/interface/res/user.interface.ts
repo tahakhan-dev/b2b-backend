@@ -15,3 +15,10 @@ export interface ILoginUser {
     Result?: Partial<UserEntity[]>
     Message?: string
 }
+
+export interface IVerificationLinkUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<UserEntity[]>
+    Message?: string
+}

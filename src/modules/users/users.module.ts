@@ -1,4 +1,4 @@
-import { CreateUserCommandHandler, LoginUserCommandHandler } from './commands.handler';
+import { CreateUserCommandHandler, LoginUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
 import { UserConditions } from 'src/common/functions/user-condition';
@@ -13,6 +13,7 @@ import { UsersService } from './users.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
 import 'dotenv/config';
+import { UserValidation } from './functions/user-validation';
 
 
 @Module({
@@ -29,10 +30,12 @@ import 'dotenv/config';
     UserMapper,
     GenerateDigits,
     UserConditions,
+    UserValidation,
     SendEmail,
     // ---- Command Handler
     CreateUserCommandHandler,
     LoginUserCommandHandler,
+    VerificationLinkUserCommandHandler
     //------ Query Handler
     //  ConsumerAccountQueryHandler
   ]

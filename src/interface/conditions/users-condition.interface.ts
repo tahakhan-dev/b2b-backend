@@ -1,12 +1,18 @@
 export interface IUserSearchOptionsByUserNameOrEmail {
-    where: [
-        {
+    where: (
+        | [{
             email?: string;
             userName?: string;
-        },
-        {
-            email?: string;
-            userName?: string;
-        }
-    ];
+        }]
+        | [
+            {
+                email?: string;
+                userName?: string;
+            },
+            {
+                email?: string;
+                userName?: string;
+            }
+        ]
+    );
 }

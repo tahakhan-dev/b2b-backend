@@ -1,4 +1,4 @@
-import { ICreateUser, ILoginUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser } from './interface/res/user.interface';
 import { CreateUserCommand } from './commands/create-user.command';
 import { LoginUserCommand } from './commands/login-user.command';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -7,6 +7,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Injectable } from '@nestjs/common';
 import 'dotenv/config';
+import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
+import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
 
 
 @Injectable()
@@ -34,6 +36,12 @@ export class UsersService {
   async LoginUserServiceHandler(loginUserDto: LoginUserDto): Promise<ILoginUser> {
     return await this.commandBus.execute(
       new LoginUserCommand(loginUserDto)
+    )
+  }
+
+  async VerificationLinkUserServiceHandler(verificationLinkUserDto: VerificationLinkUserDto): Promise<IVerificationLinkUser> {
+    return await this.commandBus.execute(
+      new VerificationLinkUserCommand(verificationLinkUserDto)
     )
   }
 
