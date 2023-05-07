@@ -1,14 +1,8 @@
-import {
-    ArgumentsHost,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-} from '@nestjs/common';
-import { Response } from 'express';
-import { IncomingMessage } from 'http';
-import { StatusCodes } from 'src/common/enums/status-codes';
+import {ArgumentsHost,Catch,ExceptionFilter,HttpException,HttpStatus} from '@nestjs/common';
 import { responseHandler } from 'src/helpers/response-handler';
+import { StatusCodes } from 'src/common/enums/status-codes';
+import { IncomingMessage } from 'http';
+import { Response } from 'express';
 
 export const getStatusCode = <T>(exception: T): number => {
     return exception instanceof HttpException

@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-
+import { ICreateUser, ILoginUser } from './interface/res/user.interface';
+import { CreateUserCommand } from './commands/create-user.command';
+import { LoginUserCommand } from './commands/login-user.command';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserRole } from 'src/common/enums/user-role';
-import { UserSignUpType } from 'src/common/enums/signup-type';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { LoginUserDto } from './dto/login-user.dto';
+import { Injectable } from '@nestjs/common';
 import 'dotenv/config';
 
 
@@ -14,9 +13,11 @@ import 'dotenv/config';
 export class UsersService {
 
   constructor(
-    @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
-    @InjectRepository(UserEntity, process.env.CONNECTION_NAME_2)
-    private userRepositorySlave: Repository<UserEntity>,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+    // @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
+    // @InjectRepository(UserEntity, process.env.CONNECTION_NAME_2)
+    // private userRepositorySlave: Repository<UserEntity>,
   ) { }
 
 
@@ -24,15 +25,27 @@ export class UsersService {
     return 'This action adds a new user';
   }
 
-  async findAll() {
-    let resp = await this.userRepository.save({
-      userName: 'tahakhwan2282', email: "t2hakhwan282@gmail.com",
-      password: "sjdflswjdfk", role: UserRole.USER, signUpType: UserSignUpType.CUSTOM
-    })
-    let resp1 = await this.userRepositorySlave.find({ where: { userName: "tahakhan2282" } });
-    console.log('============resp1===========', resp1);
+  async createUserServiceHandler(createUserDto: CreateUserDto): Promise<ICreateUser> {
+    return await this.commandBus.execute(
+      new CreateUserCommand(createUserDto)
+    )
+  }
 
-    console.log(resp, '=========resp================');
+  async LoginUserServiceHandler(loginUserDto: LoginUserDto): Promise<ILoginUser> {
+    return await this.commandBus.execute(
+      new LoginUserCommand(loginUserDto)
+    )
+  }
+
+  async findAll() {
+    // let resp = await this.userRepository.save({
+    //   userName: 'tahakhwan2282', email: "t2hakhwan282@gmail.com",
+    //   password: "sjdflswjdfk", role: UserRole.BUYER, signUpType: UserSignUpType.CUSTOM
+    // })
+    // let resp1 = await this.userRepositorySlave.find({ where: { userName: "tahakhan2282" } });
+    // console.log('============resp1===========', resp1);
+
+    // console.log(resp, '=========resp================');
 
     return 'resp1';
   }

@@ -10,7 +10,7 @@ export class UserEntity extends BaseEntity {
     userName: string;
 
     @Column({ name: 'first_name', nullable: true })
-    firstName: number;
+    firstName: string;
 
     @Column({ name: 'last_name', nullable: true })
     lastName: string;
@@ -22,28 +22,28 @@ export class UserEntity extends BaseEntity {
     @Column({ name: 'password', nullable: false })
     password: string;
 
-    @Column({ name: 'role', default: 'user', nullable: false })
+    @Column({ name: 'role', type: 'enum', enum: UserRole, default: UserRole.BUYER, nullable: false })
     role: UserRole;
 
-    @Column({ name: 'signup_type', default: 'custom', nullable: false })
+    @Column({ name: 'signup_type', type: 'enum', enum: UserSignUpType, default: UserSignUpType.CUSTOM, nullable: false })
     signUpType: UserSignUpType;
 
-    @Column({ name: 'email_verification', default: false, nullable: false })
-    emailVerification: boolean;
+    @Column({ name: 'email_verified', default: false, nullable: true })
+    emailVerified: boolean;
 
-    @Column({ name: 'opt_verification', default: false, nullable: true })
+    @Column({ name: 'opt_verification', default: true, nullable: true })
     optVerification: boolean;
 
     @Column({ name: 'phone_number', nullable: true })
     phoneNumber: string;
 
-    @Column({ name: 'is_active', nullable: true, default: true })
-    isActive: boolean;
+    @Column({ name: 'profile_image', nullable: true })
+    profileImage: string;
 
-    @Column({ name: 'is_block', nullable: true, default: false })
+    @Column({ name: 'is_block', default: false, nullable: true })
     isBlock: boolean;
 
-    @Column({ name: 'is_deleted', nullable: true, default: false })
+    @Column({ name: 'is_deleted', default: false, nullable: true })
     isDeleted: boolean;
 
     @BeforeInsert()
