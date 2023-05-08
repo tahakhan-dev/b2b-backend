@@ -1,10 +1,11 @@
 import { CommandHandler, EventPublisher, ICommandHandler } from "@nestjs/cqrs";
-import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
 import { CreateUserCommand } from "./commands/create-user.command";
 import { LoginUserCommand } from "./commands/login-user.command";
 import { UserRepository } from "./users.repository";
 import { VerificationLinkUserCommand } from "./commands/verification-link-user.command";
 import { ForgetPasswordCodeUserCommand } from "./commands/forget-password-code-user.command";
+import { ResetPasswordUserCommand } from "./commands/changing-password-user.dto";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
@@ -63,10 +64,27 @@ export class ForgetPasswordCodeUserCommandHandler implements ICommandHandler<For
 
     // @ts-ignore
     async execute(command: ForgetPasswordCodeUserCommand, resolve: (value?) => void): Promise<IForgetPasswordCodeUser> {
-        const verificationLink = this.publisher.mergeObjectContext(
+        const forgetPassword = this.publisher.mergeObjectContext(
             await this.userRepo.forgetPasswordCodeUser(command.forgetPasswordCodeUserDto),
         );
-        return verificationLink;
+        return forgetPassword;
+    }
+}
+
+
+@CommandHandler(ResetPasswordUserCommand)
+export class ResetPasswordUserCommandHandler implements ICommandHandler<ResetPasswordUserCommand> {
+    constructor(
+        private readonly userRepo: UserRepository,
+        private readonly publisher: EventPublisher,
+    ) { }
+
+    // @ts-ignore
+    async execute(command: ResetPasswordUserCommand, resolve: (value?) => void): Promise<IResetPasswordUser> {
+        const changingPassword = this.publisher.mergeObjectContext(
+            await this.userRepo.resetPasswordUser(command.resetPasswordUserDto),
+        );
+        return changingPassword;
     }
 }
 

@@ -1,4 +1,4 @@
-import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from '../interface/res/user.interface';
+import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationLinkUser } from '../interface/res/user.interface';
 import { VerificationLinkUserDto } from '../dto/verification-link-user.dto';
 import { Injectable } from '@nestjs/common';
 import { UserEntity } from '../entities/user.entity';
@@ -8,7 +8,8 @@ import { UserSignUpType } from 'src/common/enums/signup-type';
 import { responseHandler } from 'src/helpers/response-handler';
 import { Status } from 'src/common/enums/status';
 import { StatusCodes } from 'src/common/enums/status-codes';
-import { ForgetPasswordCodeUserDto } from '../dto/checking-forgetpassword-code.dto';
+import { ForgetPasswordCodeUserDto } from '../dto/checking-forgetpassword-code-user.dto';
+import { ResetPasswordUserDto } from '../dto/reset-password-user.dto';
 @Injectable()
 export class UserValidation {
 
@@ -46,6 +47,24 @@ export class UserValidation {
         if (!getUser && exists == true) return responseHandler(null, "No User Exist ", Status.SUCCESS, StatusCodes.NOT_FOUND)
 
         if (getUser && getUser?.emailVerified === true) return responseHandler(null, "You Email is already verified ", Status.SUCCESS, StatusCodes.SUCCESS)
+
+
+
+    }
+
+    userResetPasswordValidation(resetPasswordUserDto?: ResetPasswordUserDto, getUser?: Partial<UserEntity>, exists?: boolean): IResetPasswordUser {
+
+        if (resetPasswordUserDto && resetPasswordUserDto?.role as UserRole == UserRole.ADMIN)
+            return responseHandler(null, "admin can't change their password", Status.FAILED, StatusCodes.FORBIDDEN)
+
+        if (resetPasswordUserDto && resetPasswordUserDto?.signUpType as UserSignUpType != UserSignUpType.CUSTOM)
+            return responseHandler(null, "social user can't change their password", Status.FAILED, StatusCodes.FORBIDDEN);
+
+        if (!getUser && exists == true) return responseHandler(null, "you can't change your password because this user doesn't exists ", Status.SUCCESS, StatusCodes.NOT_FOUND)
+
+        if (getUser && getUser.emailVerified == false && exists == true) return responseHandler(null, "your password can't be change because your email is not verified", Status.SUCCESS, StatusCodes.FORBIDDEN)
+
+        // if (getUser && getUser?.emailVerified === true) return responseHandler(null, "You Email is already verified ", Status.SUCCESS, StatusCodes.SUCCESS)
 
 
 

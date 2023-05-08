@@ -1,11 +1,12 @@
 import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
-import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { UserVerificationCodeEntity } from "./entities/user-verfication-code.entity";
-import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code.dto";
+import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
 import { VerificationLinkUserDto } from "./dto/verification-link-user.dto";
 import { GenerateDigits } from "src/common/functions/generate-digits";
 import { UserConditions } from "src/common/functions/user-condition";
+import { ResetPasswordUserDto } from "./dto/reset-password-user.dto";
 import { responseHandler } from "src/helpers/response-handler";
 import { StatusCodes } from "../../common/enums/status-codes";
 import { UserSignUpType } from "src/common/enums/signup-type";
@@ -66,6 +67,10 @@ export class UserRepository {
         return await this.checkingForgetPasswordUserCode(forgetPasswordCodeUserDto);
     }
 
+    async resetPasswordUser(resetPasswordUserDto: ResetPasswordUserDto): Promise<any> {
+        return await this.resetUserPassword(resetPasswordUserDto);
+    }
+
     async loginUser(loginUserDto: LoginUserDto): Promise<any> {
         return await this.signIn(loginUserDto);
     }
@@ -79,7 +84,7 @@ export class UserRepository {
 
         try {
 
-            getUserWhereClause = this.userCondition.usernameOrEmail(createUserDto.email, createUserDto.userName, createUserDto.role);
+            getUserWhereClause = this.userCondition.usernameOrEmail(createUserDto.email, createUserDto.userName, createUserDto.role as UserRole);
 
             getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
@@ -134,7 +139,7 @@ export class UserRepository {
 
             if (validationError) return validationError
 
-            getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined)
+            getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole)
             getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
             validationError = this.UserValidationService.verficationLinkValidation(getUser);
@@ -164,7 +169,7 @@ export class UserRepository {
 
             if (validationError) return validationError
 
-            getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role)
+            getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole)
             getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
             validationError = this.UserValidationService.verficationLinkValidation(getUser);
@@ -196,7 +201,7 @@ export class UserRepository {
 
             if (validationError) return validationError
 
-            getUserWhereClause = this.userCondition.usernameOrEmail(forgetPasswordCodeUserDto.email, undefined)
+            getUserWhereClause = this.userCondition.usernameOrEmail(forgetPasswordCodeUserDto.email, undefined, forgetPasswordCodeUserDto.role as UserRole)
             getuser = await this.userRepositoryR.findOne(getUserWhereClause);
 
             validationError = this.UserValidationService.userForgetPasswordCodeValidation(undefined, getuser, true);
@@ -219,7 +224,6 @@ export class UserRepository {
                 response = responseHandler(null, "code has expired. Please request a new code and try again", Status.SUCCESS, StatusCodes.BAD_REQUEST)
             } else {
                 // storedDate is still valid
-                await this.userRepositoryW.update({ id: getuser.id }, { emailVerified: true });
                 await this.UserForgetPasswordRepositoryW.update({ userId: getuser.id }, { isActive: false, isDeleted: true })
                 response = responseHandler(null, "Your User has Been Verified ", Status.SUCCESS, StatusCodes.SUCCESS)
             }
@@ -233,8 +237,35 @@ export class UserRepository {
         return response;
     }
 
+    private async resetUserPassword(resetPasswordUserDto: ResetPasswordUserDto): Promise<IResetPasswordUser> {
+        let response: IResetPasswordUser, validationError: IResetPasswordUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail,
+            getuser: Partial<UserEntity>, hashResetPassword: string;
+        try {
 
+            validationError = this.UserValidationService.userResetPasswordValidation(resetPasswordUserDto, undefined, false);
 
+            if (validationError) return validationError
+
+            getUserWhereClause = this.userCondition.usernameOrEmail(resetPasswordUserDto.email, undefined, resetPasswordUserDto.role as UserRole)
+            getuser = await this.userRepositoryR.findOne(getUserWhereClause);
+
+            validationError = this.UserValidationService.userResetPasswordValidation(undefined, getuser, true);
+
+            if (validationError) return validationError
+
+            hashResetPassword = await this.authService.hashPassword(resetPasswordUserDto.password);
+
+            await this.userRepositoryW.update({ id: getuser.id }, { password: hashResetPassword });
+
+            response = responseHandler(null, "Your Password Is Changed ", Status.SUCCESS, StatusCodes.SUCCESS)
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+
+        }
+        return response;
+
+    }
 
 
 

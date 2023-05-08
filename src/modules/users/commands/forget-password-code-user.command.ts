@@ -1,4 +1,4 @@
-import { ForgetPasswordCodeUserDto } from '../dto/checking-forgetpassword-code.dto';
+import { ForgetPasswordCodeUserDto } from '../dto/checking-forgetpassword-code-user.dto';
 import { ICommand } from '@nestjs/cqrs';
 
 

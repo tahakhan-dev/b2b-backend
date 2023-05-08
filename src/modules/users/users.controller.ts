@@ -1,15 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
-import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationLinkUser } from './interface/res/user.interface';
 import { IResponseWrapper } from 'src/interface/base.response.interface';
 import { StatusCodes } from 'src/common/enums/status-codes';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Status } from 'src/common/enums/status';
 import { UsersService } from './users.service';
 import { Response } from 'express';
 import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
-import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code.dto';
+import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
+import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -19,7 +19,7 @@ export class UsersController {
   async create(@Res() res: Response, @Body() createUserDto: CreateUserDto): Promise<ICreateUser> {
 
     try {
-      
+
       const createdUser = await this.usersService.createUserServiceHandler(createUserDto);
 
       res.status(Number(createdUser.StatusCode)).json(createdUser)
@@ -94,6 +94,23 @@ export class UsersController {
     try {
       const ForgetPasswordCode = await this.usersService.checkingForgetPasswordCodeUserServiceHandler(forgetPasswordCodeUserDto);
       res.status(Number(ForgetPasswordCode.StatusCode)).json(ForgetPasswordCode)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @Post('resetUserPassword')
+  async resetUserPassword(@Res() res: Response, @Body() resetPasswordUserDto: ResetPasswordUserDto): Promise<IResetPasswordUser> {
+
+    try {
+      const ResetPassword = await this.usersService.resetPasswordUserServiceHandler(resetPasswordUserDto);
+      res.status(Number(ResetPassword.StatusCode)).json(ResetPassword)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
