@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
-import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
 import { IResponseWrapper } from 'src/interface/base.response.interface';
 import { StatusCodes } from 'src/common/enums/status-codes';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,6 +10,8 @@ import { Response } from 'express';
 import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
 import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
+import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
+import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -55,7 +57,7 @@ export class UsersController {
   }
 
   @Post('resend_verfication_link')
-  async resendVerificationLink(@Res() res: Response, @Body() verificationLinkUserDto: VerificationLinkUserDto): Promise<IVerificationLinkUser> {
+  async resendVerificationLink(@Res() res: Response, @Body() verificationLinkUserDto: ResendForgetPasswordLinkUserDto): Promise<IVerificationLinkUser> {
 
     try {
       const ResendVerificationLink = await this.usersService.VerificationLinkUserServiceHandler(verificationLinkUserDto);
@@ -72,10 +74,10 @@ export class UsersController {
   }
 
   @Post('resend_forgetpassword_link')
-  async resendForgetPasswordLink(@Res() res: Response, @Body() verificationLinkUserDto: VerificationLinkUserDto): Promise<IVerificationLinkUser> {
+  async resendForgetPasswordLink(@Res() res: Response, @Body() resendForgetPasswordLinkUserDto: ResendForgetPasswordLinkUserDto): Promise<IVerificationLinkUser> {
 
     try {
-      const ResendForgetPasswordLink = await this.usersService.resendForgetPasswordLinkUserServiceHandler(verificationLinkUserDto);
+      const ResendForgetPasswordLink = await this.usersService.resendForgetPasswordLinkUserServiceHandler(resendForgetPasswordLinkUserDto);
       res.status(Number(ResendForgetPasswordLink.StatusCode)).json(ResendForgetPasswordLink)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
@@ -105,7 +107,24 @@ export class UsersController {
     }
   }
 
-  @Post('resetUserPassword')
+  @Post('checking_verification_code')
+  async checkingVerificationCode(@Res() res: Response, @Body() verificationCodeUserDto: VerificationCodeUserDto): Promise<IVerificationCodeUser> {
+
+    try {
+      const VerificationCode = await this.usersService.checkingVerificationCodeUserServiceHandler(verificationCodeUserDto);
+      res.status(Number(VerificationCode.StatusCode)).json(VerificationCode)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @Post('reset_user_password')
   async resetUserPassword(@Res() res: Response, @Body() resetPasswordUserDto: ResetPasswordUserDto): Promise<IResetPasswordUser> {
 
     try {
@@ -121,5 +140,6 @@ export class UsersController {
       return response;
     }
   }
+  
 
 }

@@ -1,4 +1,4 @@
-import { CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
+import { CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserForgetPasswordCodeEntity } from './entities/user-forgetpassword-verfication.entity';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
@@ -39,7 +39,8 @@ import 'dotenv/config';
     VerificationLinkUserCommandHandler,
     ResendForgetPasswordLinkUserCommandHandler,
     ForgetPasswordCodeUserCommandHandler,
-    ResetPasswordUserCommandHandler
+    ResetPasswordUserCommandHandler,
+    VerificationCodeUserCommandHandler
     //------ Query Handler
     //  ConsumerAccountQueryHandler
   ]

@@ -30,6 +30,13 @@ export interface IForgetPasswordCodeUser {
     Message?: string
 }
 
+export interface IVerificationCodeUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<UserEntity[]>
+    Message?: string
+}
+
 export interface IResetPasswordUser {
     StatusCode?: StatusCodes,
     Status: Status

@@ -1,11 +1,13 @@
 import { CommandHandler, EventPublisher, ICommandHandler } from "@nestjs/cqrs";
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser } from "./interface/res/user.interface";
 import { CreateUserCommand } from "./commands/create-user.command";
 import { LoginUserCommand } from "./commands/login-user.command";
 import { UserRepository } from "./users.repository";
 import { VerificationLinkUserCommand } from "./commands/verification-link-user.command";
 import { ForgetPasswordCodeUserCommand } from "./commands/forget-password-code-user.command";
-import { ResetPasswordUserCommand } from "./commands/changing-password-user.dto";
+import { ResetPasswordUserCommand } from "./commands/changing-password-user.command";
+import { VerificationCodeUserCommand } from "./commands/verification-code-user.command";
+import { ResendForgetPasswordLinkCommand } from "./commands/resend-forgetpassword-link-user.command";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
@@ -39,19 +41,19 @@ export class VerificationLinkUserCommandHandler implements ICommandHandler<Verif
     }
 }
 
-@CommandHandler(VerificationLinkUserCommand)
-export class ResendForgetPasswordLinkUserCommandHandler implements ICommandHandler<VerificationLinkUserCommand> {
+@CommandHandler(ResendForgetPasswordLinkCommand)
+export class ResendForgetPasswordLinkUserCommandHandler implements ICommandHandler<ResendForgetPasswordLinkCommand> {
     constructor(
         private readonly userRepo: UserRepository,
         private readonly publisher: EventPublisher,
     ) { }
 
     // @ts-ignore
-    async execute(command: VerificationLinkUserCommand, resolve: (value?) => void): Promise<IVerificationLinkUser> {
-        const verificationLink = this.publisher.mergeObjectContext(
-            await this.userRepo.resendForgetPasswordLinkUser(command.verificationLinkUserDto),
+    async execute(command: ResendForgetPasswordLinkCommand, resolve: (value?) => void): Promise<IVerificationLinkUser> {
+        const resendForgetPasswordLink = this.publisher.mergeObjectContext(
+            await this.userRepo.resendForgetPasswordLinkUser(command.resendForgetPasswordLinkUserDto),
         );
-        return verificationLink;
+        return resendForgetPasswordLink;
     }
 }
 
@@ -68,6 +70,22 @@ export class ForgetPasswordCodeUserCommandHandler implements ICommandHandler<For
             await this.userRepo.forgetPasswordCodeUser(command.forgetPasswordCodeUserDto),
         );
         return forgetPassword;
+    }
+}
+
+@CommandHandler(VerificationCodeUserCommand)
+export class VerificationCodeUserCommandHandler implements ICommandHandler<VerificationCodeUserCommand> {
+    constructor(
+        private readonly userRepo: UserRepository,
+        private readonly publisher: EventPublisher,
+    ) { }
+
+    // @ts-ignore
+    async execute(command: VerificationCodeUserCommand, resolve: (value?) => void): Promise<IVerificationCodeUser> {
+        const verificationCode = this.publisher.mergeObjectContext(
+            await this.userRepo.verificationCodeUser(command.verificationCodeUserDto),
+        );
+        return verificationCode;
     }
 }
 
