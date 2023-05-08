@@ -11,6 +11,7 @@ import { StatusCodes } from 'src/common/enums/status-codes';
 import { ForgetPasswordCodeUserDto } from '../dto/checking-forgetpassword-code-user.dto';
 import { ResetPasswordUserDto } from '../dto/reset-password-user.dto';
 import { VerificationCodeUserDto } from '../dto/checking-verification-code-user.dto';
+import { ChangingPasswordUserDto } from '../dto/changing-password-user.dto';
 @Injectable()
 export class UserValidation {
 
@@ -73,7 +74,7 @@ export class UserValidation {
 
     }
 
-    userResetPasswordValidation(resetPasswordUserDto?: ResetPasswordUserDto, getUser?: Partial<UserEntity>, exists?: boolean): IResetPasswordUser {
+    userResetPasswordValidation(resetPasswordUserDto?: ResetPasswordUserDto | ChangingPasswordUserDto, getUser?: Partial<UserEntity>, exists?: boolean): IResetPasswordUser {
 
         if (resetPasswordUserDto && resetPasswordUserDto?.role as UserRole == UserRole.ADMIN)
             return responseHandler(null, "admin can't change their password", Status.FAILED, StatusCodes.FORBIDDEN)

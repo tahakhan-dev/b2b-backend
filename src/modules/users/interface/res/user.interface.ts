@@ -43,3 +43,10 @@ export interface IResetPasswordUser {
     Result?: Partial<UserEntity[]>
     Message?: string
 }
+
+export interface IChangingPasswordUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<UserEntity[]>
+    Message?: string
+}

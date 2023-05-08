@@ -1,4 +1,4 @@
-import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser } from './interface/res/user.interface';
 import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
 import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
@@ -12,11 +12,13 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { Injectable } from '@nestjs/common';
 import 'dotenv/config';
 import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
-import { ResetPasswordUserCommand } from './commands/changing-password-user.command';
+import { ResetPasswordUserCommand } from './commands/reset-password-user.command';
 import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
 import { VerificationCodeUserCommand } from './commands/verification-code-user.command';
 import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
 import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpassword-link-user.command';
+import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
+import { ChangingPasswordUserCommand } from './commands/changing-password-user.command';
 
 
 @Injectable()
@@ -69,6 +71,12 @@ export class UsersService {
   async resetPasswordUserServiceHandler(resetPasswordUserDto: ResetPasswordUserDto): Promise<IResetPasswordUser> {
     return await this.commandBus.execute(
       new ResetPasswordUserCommand(resetPasswordUserDto)
+    )
+  }
+
+  async changingPasswordUserServiceHandler(changingPasswordUserDto: ChangingPasswordUserDto): Promise<IChangingPasswordUser> {
+    return await this.commandBus.execute(
+      new ChangingPasswordUserCommand(changingPasswordUserDto)
     )
   }
 }

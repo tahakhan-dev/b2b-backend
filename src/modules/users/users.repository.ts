@@ -1,5 +1,5 @@
 import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser } from "./interface/res/user.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
 import { ResendForgetPasswordLinkUserDto } from "./dto/forget-password-link-user.dto";
@@ -26,6 +26,7 @@ import { Status } from "src/common/enums/status";
 import { LessThan, Repository } from "typeorm";
 import * as moment from 'moment';
 import 'dotenv/config';
+import { ChangingPasswordUserDto } from "./dto/changing-password-user.dto";
 
 
 @Injectable()
@@ -75,6 +76,10 @@ export class UserRepository {
 
     async resetPasswordUser(resetPasswordUserDto: ResetPasswordUserDto): Promise<any> {
         return await this.resetUserPassword(resetPasswordUserDto);
+    }
+
+    async changingPasswordUser(changingPasswordUserDto: ChangingPasswordUserDto): Promise<any> {
+        return await this.changingUserPassword(changingPasswordUserDto);
     }
 
     async loginUser(loginUserDto: LoginUserDto): Promise<any> {
@@ -310,6 +315,44 @@ export class UserRepository {
             hashResetPassword = await this.authService.hashPassword(resetPasswordUserDto.password);
 
             await this.userRepositoryW.update({ id: getuser.id }, { password: hashResetPassword });
+
+            response = responseHandler(null, "Your Password Is Changed ", Status.SUCCESS, StatusCodes.SUCCESS)
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+
+        }
+        return response;
+
+    }
+
+    private async changingUserPassword(changingPasswordUserDto: ChangingPasswordUserDto): Promise<IChangingPasswordUser> {
+        let response: IChangingPasswordUser, validationError: IChangingPasswordUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getuser: Partial<UserEntity>,
+            isOldPassword: boolean, hashPassword: string;
+        try {
+
+            console.log(changingPasswordUserDto, '==========changingPasswordUserDto===========');
+
+            validationError = this.UserValidationService.userResetPasswordValidation(changingPasswordUserDto, undefined, false);
+
+            if (validationError) return validationError
+
+            getUserWhereClause = this.userCondition.usernameOrEmail(changingPasswordUserDto.email, undefined, changingPasswordUserDto.role as UserRole)
+            getuser = await this.userRepositoryR.findOne(getUserWhereClause);
+
+
+            validationError = this.UserValidationService.userResetPasswordValidation(undefined, getuser, true);
+
+            if (validationError) return validationError
+
+
+            isOldPassword = await this.authService.comparePasswords(changingPasswordUserDto.newPassword, getuser.password);
+
+            if (isOldPassword) return responseHandler(null, "This is your old password enter new password ", Status.SUCCESS, StatusCodes.BAD_REQUEST);
+
+            hashPassword = await this.authService.hashPassword(changingPasswordUserDto.newPassword);
+
+            await this.userRepositoryW.update({ id: getuser.id }, { password: hashPassword });
 
             response = responseHandler(null, "Your Password Is Changed ", Status.SUCCESS, StatusCodes.SUCCESS)
 

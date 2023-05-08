@@ -1,9 +1,9 @@
-import { ResetPasswordUserDto } from '../dto/reset-password-user.dto';
+import { ChangingPasswordUserDto } from '../dto/changing-password-user.dto';
 import { ICommand } from '@nestjs/cqrs';
 
 
-export class ResetPasswordUserCommand implements ICommand {
+export class ChangingPasswordUserCommand implements ICommand {
     constructor(
-        public readonly resetPasswordUserDto: ResetPasswordUserDto,
+        public readonly changingPasswordUserDto: ChangingPasswordUserDto,
     ) { }
 }

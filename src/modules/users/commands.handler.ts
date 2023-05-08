@@ -1,13 +1,14 @@
 import { CommandHandler, EventPublisher, ICommandHandler } from "@nestjs/cqrs";
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser } from "./interface/res/user.interface";
 import { CreateUserCommand } from "./commands/create-user.command";
 import { LoginUserCommand } from "./commands/login-user.command";
 import { UserRepository } from "./users.repository";
 import { VerificationLinkUserCommand } from "./commands/verification-link-user.command";
 import { ForgetPasswordCodeUserCommand } from "./commands/forget-password-code-user.command";
-import { ResetPasswordUserCommand } from "./commands/changing-password-user.command";
+import { ResetPasswordUserCommand } from "./commands/reset-password-user.command";
 import { VerificationCodeUserCommand } from "./commands/verification-code-user.command";
 import { ResendForgetPasswordLinkCommand } from "./commands/resend-forgetpassword-link-user.command";
+import { ChangingPasswordUserCommand } from "./commands/changing-password-user.command";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
@@ -99,12 +100,32 @@ export class ResetPasswordUserCommandHandler implements ICommandHandler<ResetPas
 
     // @ts-ignore
     async execute(command: ResetPasswordUserCommand, resolve: (value?) => void): Promise<IResetPasswordUser> {
-        const changingPassword = this.publisher.mergeObjectContext(
+        const resetPassword = this.publisher.mergeObjectContext(
             await this.userRepo.resetPasswordUser(command.resetPasswordUserDto),
+        );
+        return resetPassword;
+    }
+}
+
+
+@CommandHandler(ChangingPasswordUserCommand)
+export class ChangingPasswordUserCommandHandler implements ICommandHandler<ChangingPasswordUserCommand> {
+    constructor(
+        private readonly userRepo: UserRepository,
+        private readonly publisher: EventPublisher,
+    ) { }
+
+    // @ts-ignore
+    async execute(command: ChangingPasswordUserCommand, resolve: (value?) => void): Promise<IChangingPasswordUser> {
+        const changingPassword = this.publisher.mergeObjectContext(
+            await this.userRepo.changingPasswordUser(command.changingPasswordUserDto),
         );
         return changingPassword;
     }
 }
+
+
+
 
 
 @CommandHandler(LoginUserCommand)

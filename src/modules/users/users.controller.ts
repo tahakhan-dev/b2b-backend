@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
-import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
 import { IResponseWrapper } from 'src/interface/base.response.interface';
 import { StatusCodes } from 'src/common/enums/status-codes';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -12,6 +12,7 @@ import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-us
 import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
 import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
 import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
+import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -140,6 +141,26 @@ export class UsersController {
       return response;
     }
   }
+
+
+  @Post('changing_password')
+  async changingUserPassword(@Res() res: Response, @Body() changingPasswordUserDto: ChangingPasswordUserDto): Promise<IChangingPasswordUser> {
+
+    try {
+      const ChangingPassword = await this.usersService.changingPasswordUserServiceHandler(changingPasswordUserDto);
+      res.status(Number(ChangingPassword.StatusCode)).json(ChangingPassword)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+
   
 
 }
