@@ -5,6 +5,7 @@ import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-us
 import { ResendForgetPasswordLinkUserDto } from "./dto/forget-password-link-user.dto";
 import { UserVerificationCodeEntity } from "./entities/user-verfication-code.entity";
 import { VerificationCodeUserDto } from "./dto/checking-verification-code-user.dto";
+import { ChangingPasswordUserDto } from "./dto/changing-password-user.dto";
 import { VerificationLinkUserDto } from "./dto/verification-link-user.dto";
 import { GenerateDigits } from "src/common/functions/generate-digits";
 import { UserConditions } from "src/common/functions/user-condition";
@@ -26,7 +27,6 @@ import { Status } from "src/common/enums/status";
 import { LessThan, Repository } from "typeorm";
 import * as moment from 'moment';
 import 'dotenv/config';
-import { ChangingPasswordUserDto } from "./dto/changing-password-user.dto";
 
 
 @Injectable()
@@ -330,8 +330,6 @@ export class UserRepository {
         let response: IChangingPasswordUser, validationError: IChangingPasswordUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getuser: Partial<UserEntity>,
             isOldPassword: boolean, hashPassword: string;
         try {
-
-            console.log(changingPasswordUserDto, '==========changingPasswordUserDto===========');
 
             validationError = this.UserValidationService.userResetPasswordValidation(changingPasswordUserDto, undefined, false);
 

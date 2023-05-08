@@ -8,7 +8,6 @@ import helmet from "helmet";
 
 async function bootstrap() {
 
-  console.log(process.env.PORT, '======process.env.PORT=====')
   const APP_PORT = process.env.PORT
 
   const app = await NestFactory.create(AppModule);

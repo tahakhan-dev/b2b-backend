@@ -24,8 +24,6 @@ export class UserValidation {
         if (verificationLinkUserDto && verificationLinkUserDto?.signUpType as UserSignUpType != UserSignUpType.CUSTOM)
             return responseHandler(null, "Verfication Link can't be sent to socail Sign UP user", Status.FAILED, StatusCodes.FORBIDDEN);
 
-        console.log(getUser, '=======getuser=========34');
-
         if (getUser && getUser?.emailVerified == true && exists == true) return responseHandler(null, "You Email is already verified ", Status.SUCCESS, StatusCodes.SUCCESS)
 
     }
