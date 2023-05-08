@@ -1,0 +1,40 @@
+PORT=3000
+#----- Database Credential 1------------------
+CONNECTION_NAME=master
+DB_HOST=104.154.67.100
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=adminpassword
+DB_DATABASE=customdatabase
+DB_TYPE=postgres
+ENABLE_AUTOMATIC_CREATION=true
+AUTO_LOAD_ENTITIES=true
+
+#----- Database Credential 2------------------
+CONNECTION_NAME_2=secondaryDB
+DB_HOST_2=104.154.67.100
+DB_PORT_2=5433
+DB_USER_2=postgres  
+DB_PASSWORD_2=adminpassword
+DB_DATABASE_2=customdatabase
+DB_TYPE_2=postgres
+ENABLE_AUTOMATIC_CREATION_2=false
+AUTO_LOAD_ENTITIES_2=true
+
+#-------- JWT Key------------------
+JWT_SECRET=hard_to_guess_secret_123
+
+# -------- Redis Key--------------------
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_TTL=178200
+
+GLOABAL_API_PREFIX=api/
+
+
+#-------------- SendGrid key ----------------------
+EMAIL_SMTP=smtp.sendgrid.net
+EMAIL_USER=apikey
+EMAIL_PASS=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
+
+FROM_EMAIL=muhammad.taha@hysabkytab.com

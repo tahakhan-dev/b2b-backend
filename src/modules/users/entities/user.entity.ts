@@ -1,6 +1,6 @@
-import { BaseEntity } from "src/entitiesList/base.entity";
-import { BeforeInsert, Column, Entity } from "typeorm";
 import { UserSignUpType } from "src/common/enums/signup-type";
+import { BaseEntity } from "src/entitiesList/base.entity";
+import { BeforeInsert, BeforeUpdate, Column, Entity } from "typeorm";
 import { UserRole } from "src/common/enums/user-role";
 import { Exclude } from "class-transformer";
 
@@ -46,9 +46,16 @@ export class UserEntity extends BaseEntity {
     @Column({ name: 'is_deleted', default: false, nullable: true })
     isDeleted: boolean;
 
+    // @BeforeInsert()
+    // emailToLowerCase() {
+    //     this.email = this.email.toLowerCase();
+    // }
+
     @BeforeInsert()
-    emailToLowerCase() {
-        this.email = this.email.toLowerCase();
+    @BeforeUpdate()
+    trimFields() {
+        this.email = this.email.toLowerCase().toString().replace(/\s/g, '');
+        this.userName = this.userName.toLowerCase().toString().replace(/\s/g, '');
     }
 }
 

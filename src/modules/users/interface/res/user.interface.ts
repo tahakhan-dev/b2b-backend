@@ -22,3 +22,10 @@ export interface IVerificationLinkUser {
     Result?: Partial<UserEntity[]>
     Message?: string
 }
+
+export interface IForgetPasswordCodeUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<UserEntity[]>
+    Message?: string
+}

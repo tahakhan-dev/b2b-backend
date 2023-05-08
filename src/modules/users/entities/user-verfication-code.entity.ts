@@ -9,7 +9,7 @@ export class UserVerificationCodeEntity extends BaseEntity {
     verificationCode: number;
 
     @Column({ name: 'token_creation_date', nullable: false })
-    token_creation_date: string;
+    tokenCreationDate: string;
 
 }
 

@@ -1,9 +1,10 @@
 import { CommandHandler, EventPublisher, ICommandHandler } from "@nestjs/cqrs";
-import { ICreateUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
+import { ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser } from "./interface/res/user.interface";
 import { CreateUserCommand } from "./commands/create-user.command";
 import { LoginUserCommand } from "./commands/login-user.command";
 import { UserRepository } from "./users.repository";
 import { VerificationLinkUserCommand } from "./commands/verification-link-user.command";
+import { ForgetPasswordCodeUserCommand } from "./commands/forget-password-code-user.command";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
@@ -38,7 +39,7 @@ export class VerificationLinkUserCommandHandler implements ICommandHandler<Verif
 }
 
 @CommandHandler(VerificationLinkUserCommand)
-export class ResendForgetPasswordLinkCommandHandler implements ICommandHandler<VerificationLinkUserCommand> {
+export class ResendForgetPasswordLinkUserCommandHandler implements ICommandHandler<VerificationLinkUserCommand> {
     constructor(
         private readonly userRepo: UserRepository,
         private readonly publisher: EventPublisher,
@@ -48,6 +49,22 @@ export class ResendForgetPasswordLinkCommandHandler implements ICommandHandler<V
     async execute(command: VerificationLinkUserCommand, resolve: (value?) => void): Promise<IVerificationLinkUser> {
         const verificationLink = this.publisher.mergeObjectContext(
             await this.userRepo.resendForgetPasswordLinkUser(command.verificationLinkUserDto),
+        );
+        return verificationLink;
+    }
+}
+
+@CommandHandler(ForgetPasswordCodeUserCommand)
+export class ForgetPasswordCodeUserCommandHandler implements ICommandHandler<ForgetPasswordCodeUserCommand> {
+    constructor(
+        private readonly userRepo: UserRepository,
+        private readonly publisher: EventPublisher,
+    ) { }
+
+    // @ts-ignore
+    async execute(command: ForgetPasswordCodeUserCommand, resolve: (value?) => void): Promise<IForgetPasswordCodeUser> {
+        const verificationLink = this.publisher.mergeObjectContext(
+            await this.userRepo.forgetPasswordCodeUser(command.forgetPasswordCodeUserDto),
         );
         return verificationLink;
     }

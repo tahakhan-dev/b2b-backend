@@ -36,7 +36,7 @@ export class UserMapper {
         const verifObj = new UserVerificationCodeEntity();
         verifObj.userId = userId
         verifObj.verificationCode = verificationCode,
-            verifObj.token_creation_date = formattedDate
+            verifObj.tokenCreationDate = formattedDate
 
         return verifObj
     }

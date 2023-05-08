@@ -1,10 +1,9 @@
-import { MailerService } from "@nestjs-modules/mailer";
-import { Injectable } from "@nestjs/common";
-import { CreateUserDto } from "src/modules/users/dto/create-user.dto";
-import { UserSignUpType } from "src/common/enums/signup-type";
-import { UserRole } from "src/common/enums/user-role";
 import { verifyEmailTemplate } from "src/common/template/verify-email.template";
 import { UserEntity } from "src/modules/users/entities/user.entity";
+import { UserSignUpType } from "src/common/enums/signup-type";
+import { MailerService } from "@nestjs-modules/mailer";
+import { UserRole } from "src/common/enums/user-role";
+import { Injectable } from "@nestjs/common";
 import 'dotenv/config';
 
 @Injectable()

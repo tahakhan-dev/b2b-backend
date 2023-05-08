@@ -1,6 +1,5 @@
-import { LoginUserDto } from '../dto/login-user.dto';
-import { ICommand } from '@nestjs/cqrs';
 import { VerificationLinkUserDto } from '../dto/verification-link-user.dto';
+import { ICommand } from '@nestjs/cqrs';
 
 
 export class VerificationLinkUserCommand implements ICommand {

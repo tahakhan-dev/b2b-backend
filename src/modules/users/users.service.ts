@@ -1,4 +1,8 @@
-import { ICreateUser, ILoginUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser } from './interface/res/user.interface';
+import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
+import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
+import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code.dto';
+import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
 import { CreateUserCommand } from './commands/create-user.command';
 import { LoginUserCommand } from './commands/login-user.command';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -7,8 +11,6 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Injectable } from '@nestjs/common';
 import 'dotenv/config';
-import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
-import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
 
 
 @Injectable()
@@ -21,11 +23,6 @@ export class UsersService {
     // @InjectRepository(UserEntity, process.env.CONNECTION_NAME_2)
     // private userRepositorySlave: Repository<UserEntity>,
   ) { }
-
-
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
 
   async createUserServiceHandler(createUserDto: CreateUserDto): Promise<ICreateUser> {
     return await this.commandBus.execute(
@@ -51,28 +48,9 @@ export class UsersService {
     )
   }
 
-  async findAll() {
-    // let resp = await this.userRepository.save({
-    //   userName: 'tahakhwan2282', email: "t2hakhwan282@gmail.com",
-    //   password: "sjdflswjdfk", role: UserRole.BUYER, signUpType: UserSignUpType.CUSTOM
-    // })
-    // let resp1 = await this.userRepositorySlave.find({ where: { userName: "tahakhan2282" } });
-    // console.log('============resp1===========', resp1);
-
-    // console.log(resp, '=========resp================');
-
-    return 'resp1';
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async checkingForgetPasswordCodeUserServiceHandler(forgetPasswordCodeUserDto: ForgetPasswordCodeUserDto): Promise<IForgetPasswordCodeUser> {
+    return await this.commandBus.execute(
+      new ForgetPasswordCodeUserCommand(forgetPasswordCodeUserDto)
+    )
   }
 }

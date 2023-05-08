@@ -1,7 +1,6 @@
 import { IResponseWrapper } from "../../src/interface/base.response.interface";
 import { StatusCodes } from "../../src/common/enums/status-codes";
 import { Status } from "../../src/common/enums/status";
-import { Logger } from "@nestjs/common";
 
 export function responseHandler<T>(Result: Partial<T>, Message: string, Status: Status, StatusCode: StatusCodes): IResponseWrapper<T> {
 

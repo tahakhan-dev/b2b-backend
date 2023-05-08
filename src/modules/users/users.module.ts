@@ -1,4 +1,4 @@
-import { CreateUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
+import { CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
 import { UserConditions } from 'src/common/functions/user-condition';
@@ -37,7 +37,8 @@ import { UserForgetPasswordCodeEntity } from './entities/user-forgetpassword-ver
     CreateUserCommandHandler,
     LoginUserCommandHandler,
     VerificationLinkUserCommandHandler,
-    ResendForgetPasswordLinkCommandHandler
+    ResendForgetPasswordLinkUserCommandHandler,
+    ForgetPasswordCodeUserCommandHandler
     //------ Query Handler
     //  ConsumerAccountQueryHandler
   ]
