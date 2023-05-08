@@ -1,18 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
 import { IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
+import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
+import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
+import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
+import { Controller, Get, Post, Body, Res, UseGuards } from '@nestjs/common';
 import { IResponseWrapper } from 'src/interface/base.response.interface';
+import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
+import { hasRoles } from '../auth/guards/decorators/roles.decorator';
 import { StatusCodes } from 'src/common/enums/status-codes';
+import { JwtAuthGuard } from '../auth/guards/jwt-guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserRole } from 'src/common/enums/user-role';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Status } from 'src/common/enums/status';
 import { UsersService } from './users.service';
 import { Response } from 'express';
-import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
-import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
-import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
-import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
-import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
-import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -56,6 +59,7 @@ export class UsersController {
       return response;
     }
   }
+
 
   @Post('resend_verfication_link')
   async resendVerificationLink(@Res() res: Response, @Body() verificationLinkUserDto: ResendForgetPasswordLinkUserDto): Promise<IVerificationLinkUser> {
@@ -143,6 +147,8 @@ export class UsersController {
   }
 
 
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('changing_password')
   async changingUserPassword(@Res() res: Response, @Body() changingPasswordUserDto: ChangingPasswordUserDto): Promise<IChangingPasswordUser> {
 
@@ -161,6 +167,6 @@ export class UsersController {
   }
 
 
-  
+
 
 }

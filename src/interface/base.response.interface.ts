@@ -1,3 +1,4 @@
+import { UserRole } from "src/common/enums/user-role";
 import { StatusCodes } from "../common/enums/status-codes";
 
 export interface IResponseWrapper<T> {
@@ -6,5 +7,17 @@ export interface IResponseWrapper<T> {
     Status: number,
     Message: string;
 }
+
+export interface IDecryptWrapper {
+    userId: string,
+    userName: string,
+    email: string,
+    isVerified: boolean,
+    role: UserRole,
+    iat: number,
+    exp: number
+}
+
+
 
 

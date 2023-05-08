@@ -27,6 +27,7 @@ import { Status } from "src/common/enums/status";
 import { LessThan, Repository } from "typeorm";
 import * as moment from 'moment';
 import 'dotenv/config';
+import { Observable, from, map } from "rxjs";
 
 
 @Injectable()
@@ -248,7 +249,6 @@ export class UserRepository {
         return response;
     }
 
-
     private async checkingVerificationUserCode(verificationCodeUserDto: VerificationCodeUserDto): Promise<IVerificationCodeUser> {
         let response: IVerificationCodeUser, validationError: IVerificationCodeUser, getuser: Partial<UserEntity>,
             getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUsercode: Partial<UserVerificationCodeEntity>, getVerificationCode: IUserCodeByUserId;
@@ -364,13 +364,21 @@ export class UserRepository {
 
 
     private async signIn(loginUserDto: LoginUserDto): Promise<ILoginUser> {
-        let response;
+        let response: ILoginUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUser: UserEntity,
+            validationError: ILoginUser, checkingUserPassword: boolean, usertoken: string;
         try {
 
-            console.log(loginUserDto, '===========loginUserDto========');
+            getUserWhereClause = this.userCondition.usernameOrEmail(loginUserDto.email, loginUserDto.userName, loginUserDto.role as UserRole);
+            getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
+            validationError = this.UserValidationService.loginUserValidation(getUser, loginUserDto);
+            if (validationError) return validationError
 
-            response = responseHandler(null, "sent you email for verification", Status.SUCCESS, StatusCodes.SUCCESS);
+            checkingUserPassword = await this.authService.comparePasswords(loginUserDto.password, getUser.password);
+            usertoken = await this.authService.generateJWT(getUser);
+            getUser.token = usertoken
+
+            response = responseHandler([getUser], "Login Successfully", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
 
@@ -384,6 +392,36 @@ export class UserRepository {
         }
 
         return response
+    }
+
+    // async findOne(userName: string, email: string, role: UserRole): Promise<Partial<UserEntity>> {
+
+    //     try {
+    //         let response: Partial<UserEntity>
+
+    //         response = await this.userRepositoryR.findOne({
+    //             where: [{
+    //                 userName, role
+    //             }, {
+    //                 email, role
+    //             }]
+    //         });
+
+    //         return response;
+
+    //     } catch (error) {
+    //         console.log(error);
+
+    //     }
+    // }
+
+    findOne(userName: string, email: string, role: UserRole): Observable<Partial<UserEntity>> {
+        return from(this.userRepositoryR.findOne({ where: [{ userName, role }, { email, role }] })).pipe(
+            map((user: UserEntity) => {
+                const { password, ...result } = user;
+                return result;
+            })
+        )
     }
 
 

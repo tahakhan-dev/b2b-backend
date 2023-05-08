@@ -2,7 +2,6 @@ import { UserSignUpType } from "src/common/enums/signup-type";
 import { BaseEntity } from "src/entitiesList/base.entity";
 import { BeforeInsert, BeforeUpdate, Column, Entity } from "typeorm";
 import { UserRole } from "src/common/enums/user-role";
-import { Exclude } from "class-transformer";
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseEntity {
@@ -17,8 +16,7 @@ export class UserEntity extends BaseEntity {
 
     @Column({ name: 'email', nullable: false, unique: true })
     email: string;
-
-    @Exclude()
+ 
     @Column({ name: 'password', nullable: false })
     password: string;
 
@@ -50,6 +48,8 @@ export class UserEntity extends BaseEntity {
     // emailToLowerCase() {
     //     this.email = this.email.toLowerCase();
     // }
+    token: string;
+
 
     @BeforeInsert()
     @BeforeUpdate()

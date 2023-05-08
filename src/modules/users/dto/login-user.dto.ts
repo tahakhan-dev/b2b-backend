@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, IsOptional } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString, IsOptional, IsBoolean } from "class-validator";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { UserRole } from "src/common/enums/user-role";
 
@@ -8,7 +8,7 @@ export class LoginUserDto {
     @IsString()
     userName: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     email: string;
 
@@ -23,4 +23,6 @@ export class LoginUserDto {
     @IsNotEmpty()
     @IsEnum(UserSignUpType)
     signUpType: UserSignUpType;
+
+
 }

@@ -12,6 +12,7 @@ import { ForgetPasswordCodeUserDto } from '../dto/checking-forgetpassword-code-u
 import { ResetPasswordUserDto } from '../dto/reset-password-user.dto';
 import { VerificationCodeUserDto } from '../dto/checking-verification-code-user.dto';
 import { ChangingPasswordUserDto } from '../dto/changing-password-user.dto';
+import { LoginUserDto } from '../dto/login-user.dto';
 @Injectable()
 export class UserValidation {
 
@@ -88,5 +89,13 @@ export class UserValidation {
 
 
 
+    }
+
+    loginUserValidation(getUser?: Partial<UserEntity>, loginUserDto?: LoginUserDto): ILoginUser {
+        if (!getUser) return responseHandler(null, "user does not exists try sign up with this email", Status.FAILED, StatusCodes.FORBIDDEN)
+        if (getUser?.isBlock) return responseHandler(null, "This user is block by admin contact our customer support", Status.FAILED, StatusCodes.FORBIDDEN)
+        if (getUser?.isDeleted) return responseHandler(null, "This user Deleted", Status.FAILED, StatusCodes.FORBIDDEN)
+        if (getUser && !getUser?.emailVerified) return responseHandler(null, "your email is not verified", Status.FAILED, StatusCodes.FORBIDDEN)
+        if (getUser && getUser?.role as UserRole != loginUserDto?.role as UserRole) return responseHandler(null, "there is some error please try again with different email Id", Status.FAILED, StatusCodes.FORBIDDEN)
     }
 }
