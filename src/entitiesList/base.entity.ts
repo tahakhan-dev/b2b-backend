@@ -1,4 +1,5 @@
 import { Column, PrimaryGeneratedColumn, BeforeUpdate } from 'typeorm';
+import * as moment from 'moment';
 
 
 export class BaseEntity {
@@ -13,10 +14,10 @@ export class BaseEntity {
     @Column({ name: 'is_deleted', type: 'boolean', default: false })
     isDeleted: boolean;
 
-    @Column({ name: 'server_created_on', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    @Column({ name: 'server_created_on', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
     serverCreatedOn: Date;
 
-    @Column({ name: 'server_updated_on', type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    @Column({ name: 'server_updated_on', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     serverUpdatedOn: Date;
 
 

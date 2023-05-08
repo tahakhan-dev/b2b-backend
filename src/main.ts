@@ -1,14 +1,13 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import rateLimit from 'express-rate-limit';
 import helmet from "helmet";
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 
 
 
 async function bootstrap() {
 
-  console.log(process.env.PORT, '======process.env.PORT=====')
   const APP_PORT = process.env.PORT
 
   const app = await NestFactory.create(AppModule);

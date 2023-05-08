@@ -1,6 +1,6 @@
+import { MicroServiceHealthCheckService } from './microservice-health-check.service';
 import { Controller, Get, Post, Body } from '@nestjs/common';
 import { AppService } from './app.service';
-import { MicroServiceHealthCheckService } from './microservice-health-check.service';
 
 @Controller()
 export class AppController {
