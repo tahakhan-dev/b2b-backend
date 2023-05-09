@@ -22,7 +22,7 @@ export class CreateUserDto {
     @Transform(({ value }) => value.toLowerCase().toString().replace(/\s/g, ''))
     email: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     password: string;
 

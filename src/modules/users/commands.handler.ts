@@ -18,11 +18,15 @@ export class CreateUserCommandHandler implements ICommandHandler<CreateUserComma
     ) { }
 
     // @ts-ignore
+    //The execute method returns a Promise of an ICreateUser object, which likely represents the newly created user account.
     async execute(command: CreateUserCommand, resolve: (value?) => void): Promise<ICreateUser> {
-        const account = this.publisher.mergeObjectContext(
+        // command: an instance of the CreateUserCommand class, which is likely the command object that contains the data required to create a new user in the system.
+        // resolve: a callback function that takes an optional value parameter and returns nothing
+
+        const account = this.publisher.mergeObjectContext(  // The result of the createUser method call is passed to the publisher.mergeObjectContext method, which is likely a method provided by a NestJS library. This method merges the created user account object with the current context, which is likely used for handling the transactional aspect of the operation.
             await this.userRepo.createUser(command.createUsertDto),
         );
-        return account;
+        return account;  // Finally, the resulting account object is returned by the execute method, which will be resolved by the calling function or method
     }
 }
 

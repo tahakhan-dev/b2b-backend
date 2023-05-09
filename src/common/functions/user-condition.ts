@@ -5,7 +5,7 @@ import { UserRole } from '../enums/user-role';
 @Injectable()
 export class UserConditions {
 
-    usernameOrEmail(email?: string, userName?: string, role?: UserRole): IUserSearchOptionsByUserNameOrEmail {
+    usernameOrEmail(email?: string, userName?: string, role?: UserRole): IUserSearchOptionsByUserNameOrEmail { // username and email function condition asigning interface to it
 
 
         let condition: IUserSearchOptionsByUserNameOrEmail = email && userName ? { where: [{ email, role }, { userName, role }] } : email == undefined ? { where: [{ userName, role }] } : { where: [{ email, role }] }

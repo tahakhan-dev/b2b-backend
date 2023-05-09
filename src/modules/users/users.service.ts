@@ -10,7 +10,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Injectable } from '@nestjs/common';
-import 'dotenv/config';
 import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
 import { ResetPasswordUserCommand } from './commands/reset-password-user.command';
 import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
@@ -19,6 +18,7 @@ import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user
 import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpassword-link-user.command';
 import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
 import { ChangingPasswordUserCommand } from './commands/changing-password-user.command';
+import 'dotenv/config';
 
 
 @Injectable()
@@ -26,16 +26,13 @@ export class UsersService {
 
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-    // @InjectRepository(UserEntity) private userRepository: Repository<UserEntity>,
-    // @InjectRepository(UserEntity, process.env.CONNECTION_NAME_2)
-    // private userRepositorySlave: Repository<UserEntity>,
+    private readonly queryBus: QueryBus,     // commandBus and queryBus, both of which are instances of the CommandBus and QueryBus classes respectively. These classes are likely dependencies of the class or module where this constructor is defined
   ) { }
 
-  async createUserServiceHandler(createUserDto: CreateUserDto): Promise<ICreateUser> {
-    return await this.commandBus.execute(
+  async createUserServiceHandler(createUserDto: CreateUserDto): Promise<ICreateUser> {  // The createUserServiceHandler function is defined as an asynchronous function that takes a CreateUserDto object as its argument and returns a Promise of an ICreateUser object.
+    return await this.commandBus.execute(  //  the commandBus.execute method is called with a new instance of the CreateUserCommand class, passing the createUserDto object as its argument. This suggests that CreateUserCommand is a command object that is used to create a new user. The execute method is likely defined within the CommandBus class and handles the execution of the command.
       new CreateUserCommand(createUserDto)
-    )
+    )                                       // createUserServiceHandler function returns the result of the commandBus.execute method call, which is a Promise of the ICreateUser object.
   }
 
   async LoginUserServiceHandler(loginUserDto: LoginUserDto): Promise<ILoginUser> {
