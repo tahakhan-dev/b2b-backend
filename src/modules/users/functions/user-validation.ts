@@ -33,6 +33,10 @@ export class UserValidation {
         if (createUserDto?.userName === getUser?.userName)
             return responseHandler(null, "This UserName Already Exists", Status.FAILED, StatusCodes.CONFLICT);
 
+        if (createUserDto.role as UserRole != UserRole.ADMIN && createUserDto?.password == undefined) {
+            return responseHandler(null, "Password Is Required", Status.FAILED, StatusCodes.UNPROCESSABLE_ENTITY);
+        }
+
         if (createUserDto?.email === getUser?.email)
             return responseHandler(null, "This Email Already Exists", Status.FAILED, StatusCodes.CONFLICT);
 

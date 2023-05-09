@@ -25,9 +25,9 @@ import { AuthService } from "../auth/auth.service";
 import { UserMapper } from "./mapper/user.mapper";
 import { Status } from "src/common/enums/status";
 import { LessThan, Repository } from "typeorm";
+import { Observable, from, map } from "rxjs";
 import * as moment from 'moment';
 import 'dotenv/config';
-import { Observable, from, map } from "rxjs";
 
 
 @Injectable()
@@ -88,7 +88,9 @@ export class UserRepository {
     }
 
 
-    private async saveUser(createUserDto: CreateUserDto): Promise<ICreateUser> {
+    // --------------------------------- IMPLEMENTATION BUSSINESS LOGIC ---------------------------------------------------------
+
+    private async saveUser(createUserDto: CreateUserDto): Promise<ICreateUser> { // declare multiple  variables
         let response: ICreateUser, mappedUser: Partial<UserEntity>, randomNumber: number,
             userCreated: UserEntity, verficationMapper: UserVerificationCodeEntity,
             getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUser: UserEntity,
@@ -96,23 +98,23 @@ export class UserRepository {
 
         try {
 
-            getUserWhereClause = this.userCondition.usernameOrEmail(createUserDto.email, createUserDto.userName, createUserDto.role as UserRole);
+            getUserWhereClause = this.userCondition.usernameOrEmail(createUserDto.email, createUserDto.userName, createUserDto.role as UserRole); // geting condition of username or email
 
-            getUser = await this.userRepositoryR.findOne(getUserWhereClause);
+            getUser = await this.userRepositoryR.findOne(getUserWhereClause); // finding user
 
-            validationError = this.UserValidationService.userExistsValidation(createUserDto, getUser);
+            validationError = this.UserValidationService.userExistsValidation(createUserDto, getUser); // validating user 
             if (validationError) return validationError
 
 
-            createUserDto.password = createUserDto && createUserDto.signUpType == UserSignUpType.CUSTOM ?
+            createUserDto.password = createUserDto && createUserDto.signUpType == UserSignUpType.CUSTOM ? // hasing password if user is custom
                 await this.authService.hashPassword(createUserDto.password) :
-                await this.authService.hashPassword(createUserDto.email.split('@')[0]);
+                await this.authService.hashPassword(createUserDto.email.split('@')[0]); // spliting email and assigning password
 
-            mappedUser = this.mapper.createuserObj(createUserDto);
+            mappedUser = this.mapper.createuserObj(createUserDto); // creating user object
 
-            userCreated = await this.userRepositoryW.save(mappedUser);
+            userCreated = await this.userRepositoryW.save(mappedUser); // storing data
 
-            if (mappedUser && mappedUser.signUpType as UserSignUpType == UserSignUpType.CUSTOM && mappedUser.role as UserRole != UserRole.ADMIN) {
+            if (mappedUser && mappedUser.signUpType as UserSignUpType == UserSignUpType.CUSTOM && mappedUser.role as UserRole != UserRole.ADMIN) { // if user is custom and not admin then send user verfication link
 
                 randomNumber = this.randomDigit.generateRandomDigits(5);
                 verficationMapper = this.mapper.createVerificationObj(userCreated.id, randomNumber)
@@ -147,12 +149,12 @@ export class UserRepository {
 
         try {
 
-            validationError = this.UserValidationService.verficationLinkValidation(verificationLinkUserDto, undefined, undefined);
+            validationError = this.UserValidationService.verficationLinkValidation(verificationLinkUserDto, undefined, undefined); // validating user
 
             if (validationError) return validationError
 
-            getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole)
-            getUser = await this.userRepositoryR.findOne(getUserWhereClause);
+            getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole) // geting user condition
+            getUser = await this.userRepositoryR.findOne(getUserWhereClause); // finding user
 
             validationError = this.UserValidationService.verficationLinkValidation(verificationLinkUserDto, getUser, true);
 
@@ -394,26 +396,6 @@ export class UserRepository {
         return response
     }
 
-    // async findOne(userName: string, email: string, role: UserRole): Promise<Partial<UserEntity>> {
-
-    //     try {
-    //         let response: Partial<UserEntity>
-
-    //         response = await this.userRepositoryR.findOne({
-    //             where: [{
-    //                 userName, role
-    //             }, {
-    //                 email, role
-    //             }]
-    //         });
-
-    //         return response;
-
-    //     } catch (error) {
-    //         console.log(error);
-
-    //     }
-    // }
 
     findOne(userName: string, email: string, role: UserRole): Observable<Partial<UserEntity>> {
         return from(this.userRepositoryR.findOne({ where: [{ userName, role }, { email, role }] })).pipe(

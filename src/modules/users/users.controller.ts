@@ -21,12 +21,12 @@ import { Response } from 'express';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @Post('signup')
-  async create(@Res() res: Response, @Body() createUserDto: CreateUserDto): Promise<ICreateUser> {
+  @Post('signup') // creating user
+  async create(@Res() res: Response, @Body() createUserDto: CreateUserDto): Promise<ICreateUser> {  // The createUserDto object is then passed as an argument to the createUserServiceHandler method of the usersService instance, which is responsible for creating a new user based on the information in the DTO
 
     try {
 
-      const createdUser = await this.usersService.createUserServiceHandler(createUserDto);
+      const createdUser = await this.usersService.createUserServiceHandler(createUserDto);  // If the user is successfully created, the response is returned as a JSON object with a status code and the user information. If there is an error, the catch block is executed, and an error response is returned with an error message and a status code of 500 (Internal Server Error).
 
       res.status(Number(createdUser.StatusCode)).json(createdUser)
     } catch (error) {
@@ -42,7 +42,7 @@ export class UsersController {
   }
 
 
-  @Post('login')
+  @Post('login')  // user login controller
   async login(@Res() res: Response, @Body() loginUserDto: LoginUserDto): Promise<ILoginUser> {
 
     try {
@@ -61,7 +61,7 @@ export class UsersController {
   }
 
 
-  @Post('resend_verfication_link')
+  @Post('resend_verfication_link') // if user doesn't get verfication code in email, he can send verfification link again
   async resendVerificationLink(@Res() res: Response, @Body() verificationLinkUserDto: ResendForgetPasswordLinkUserDto): Promise<IVerificationLinkUser> {
 
     try {
@@ -78,7 +78,7 @@ export class UsersController {
     }
   }
 
-  @Post('resend_forgetpassword_link')
+  @Post('resend_forgetpassword_link') // if your forget his password, it can generate verfication code for this
   async resendForgetPasswordLink(@Res() res: Response, @Body() resendForgetPasswordLinkUserDto: ResendForgetPasswordLinkUserDto): Promise<IVerificationLinkUser> {
 
     try {
@@ -95,7 +95,7 @@ export class UsersController {
     }
   }
 
-  @Post('checking_forgetpassword_code')
+  @Post('checking_forgetpassword_code') // checking forget password verfication code which was received from email whether it's valid or it's expire
   async checkingForgetpasswordCode(@Res() res: Response, @Body() forgetPasswordCodeUserDto: ForgetPasswordCodeUserDto): Promise<IForgetPasswordCodeUser> {
 
     try {
@@ -112,7 +112,7 @@ export class UsersController {
     }
   }
 
-  @Post('checking_verification_code')
+  @Post('checking_verification_code') // checking user verification code which was received from email when he signup 
   async checkingVerificationCode(@Res() res: Response, @Body() verificationCodeUserDto: VerificationCodeUserDto): Promise<IVerificationCodeUser> {
 
     try {
@@ -129,7 +129,7 @@ export class UsersController {
     }
   }
 
-  @Post('reset_user_password')
+  @Post('reset_user_password') // reseting it's password 
   async resetUserPassword(@Res() res: Response, @Body() resetPasswordUserDto: ResetPasswordUserDto): Promise<IResetPasswordUser> {
 
     try {
@@ -149,7 +149,7 @@ export class UsersController {
 
   @hasRoles(UserRole.BUYER, UserRole.SELLER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('changing_password')
+  @Post('changing_password') // chaning password with in the application
   async changingUserPassword(@Res() res: Response, @Body() changingPasswordUserDto: ChangingPasswordUserDto): Promise<IChangingPasswordUser> {
 
     try {
@@ -165,8 +165,6 @@ export class UsersController {
       return response;
     }
   }
-
-
 
 
 }
