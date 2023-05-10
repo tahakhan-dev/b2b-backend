@@ -12,7 +12,7 @@ export class ForgetPasswordCodeUserDto {
     @IsNotEmpty()
     @IsNumber()
     @IsFiveDigitNumber({ message: "Code should be a 5-digit number." })  // This is a custom validation decorator written using the class-validator library.
-    Code: number
+    code: number
 
     @IsNotEmpty()
     @IsEnum(UserRole)

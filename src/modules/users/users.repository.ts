@@ -238,7 +238,7 @@ export class UserRepository {
             if (validationError) return validationError
 
 
-            getVerificationCode = this.userCondition.getUserCodeByUserId(getuser.id, forgetPasswordCodeUserDto.Code)
+            getVerificationCode = this.userCondition.getUserCodeByUserId(getuser.id, forgetPasswordCodeUserDto.code)
             getUsercode = await this.UserForgetPasswordRepositoryR.findOne(getVerificationCode);
 
             if (!getUsercode) return responseHandler(null, "This Code does not belong to this user or it's expire try again by generating new code ", Status.SUCCESS, StatusCodes.NOT_FOUND)
@@ -285,7 +285,7 @@ export class UserRepository {
             if (validationError) return validationError
 
 
-            getVerificationCode = this.userCondition.getUserCodeByUserId(getuser.id, verificationCodeUserDto.Code)
+            getVerificationCode = this.userCondition.getUserCodeByUserId(getuser.id, verificationCodeUserDto.code)
             getUsercode = await this.userVerificationCodeRepositoryR.findOne(getVerificationCode);
 
             if (!getUsercode) return responseHandler(null, "This Code does not belong to this user or it's expire try again by generating new code ", Status.SUCCESS, StatusCodes.NOT_FOUND)
