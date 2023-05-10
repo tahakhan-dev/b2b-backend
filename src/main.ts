@@ -26,7 +26,7 @@ async function bootstrap() {
   app.use(
     rateLimit({
       windowMs: 5 * 60 * 1000, // 5 minutes
-      max: 1000, // limit each IP to 100 requests per windowMs,
+      max: 100, // limit each IP to 100 requests per windowMs,
       message: "Too many request created from this IP, please try again after an 5 minutes"
     }),
   );

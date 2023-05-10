@@ -9,7 +9,7 @@ export interface IResponseWrapper<T> {
 }
 
 export interface IDecryptWrapper {
-    userId: string,
+    userId: number,
     userName: string,
     email: string,
     isVerified: boolean,

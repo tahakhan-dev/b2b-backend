@@ -1,9 +1,9 @@
-import { IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IResetPasswordUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, IGetProfileUser, ILoginUser, IResetPasswordUser, IUpdateProfileUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
 import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
 import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
 import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
-import { Controller, Get, Post, Body, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, UseGuards, Req } from '@nestjs/common';
 import { IResponseWrapper } from 'src/interface/base.response.interface';
 import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
 import { hasRoles } from '../auth/guards/decorators/roles.decorator';
@@ -15,7 +15,8 @@ import { UserRole } from 'src/common/enums/user-role';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Status } from 'src/common/enums/status';
 import { UsersService } from './users.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
+import { UpdateUserProfileUserDto } from './dto/update-profile-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -155,6 +156,45 @@ export class UsersController {
     try {
       const ChangingPassword = await this.usersService.changingPasswordUserServiceHandler(changingPasswordUserDto);
       res.status(Number(ChangingPassword.StatusCode)).json(ChangingPassword)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('update_user_profile') // chaning password with in the application
+  async updateUserProfile(@Res() res: Response, @Req() request: Request, @Body() updateUserProfileUserDto: UpdateUserProfileUserDto): Promise<IUpdateProfileUser> {
+
+    try {
+      const UpdateProfile = await this.usersService.updateProfileUserServiceHandler(updateUserProfileUserDto, request);
+      res.status(Number(UpdateProfile.StatusCode)).json(UpdateProfile)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('get_user_profile') // chaning password with in the application
+  async getUserProfile(@Res() res: Response, @Req() request: Request): Promise<IGetProfileUser> {
+
+    try {
+      const getUserProfile = await this.usersService.getProfileUserServiceHandler(request);
+      res.status(Number(getUserProfile.StatusCode)).json(getUserProfile)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,

@@ -1,4 +1,4 @@
-import { ChangingPasswordUserCommandHandler, CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
+import { ChangingPasswordUserCommandHandler, CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, UpdateProfileUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserForgetPasswordCodeEntity } from './entities/user-forgetpassword-verfication.entity';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
@@ -14,6 +14,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
+import { DecryptToken } from 'src/common/functions/decrypt-token';
+import { GetProfileUserQueryHandler } from './query.handler';
 import 'dotenv/config';
 
 
@@ -33,6 +35,7 @@ import 'dotenv/config';
     UserConditions,
     UserValidation,
     SendEmail,
+    DecryptToken,
     // ---- Command Handler
     CreateUserCommandHandler,
     LoginUserCommandHandler,
@@ -41,9 +44,11 @@ import 'dotenv/config';
     ForgetPasswordCodeUserCommandHandler,
     ResetPasswordUserCommandHandler,
     VerificationCodeUserCommandHandler,
-    ChangingPasswordUserCommandHandler
+    ChangingPasswordUserCommandHandler,
+    UpdateProfileUserCommandHandler,
     //------ Query Handler
-    //  ConsumerAccountQueryHandler
-  ]
+    GetProfileUserQueryHandler
+  ],
+  exports: [UserRepository]
 })
 export class UsersModule { }

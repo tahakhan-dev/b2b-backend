@@ -1,4 +1,4 @@
-import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser } from './interface/res/user.interface';
 import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
 import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
@@ -6,7 +6,6 @@ import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
 import { CreateUserCommand } from './commands/create-user.command';
 import { LoginUserCommand } from './commands/login-user.command';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Injectable } from '@nestjs/common';
@@ -18,7 +17,11 @@ import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user
 import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpassword-link-user.command';
 import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
 import { ChangingPasswordUserCommand } from './commands/changing-password-user.command';
+import { UpdateUserProfileUserDto } from './dto/update-profile-user.dto';
+import { UpdateProfileUserCommand } from './commands/update-profile-user.command';
+import { Request } from 'express';
 import 'dotenv/config';
+import { GetProfileUserQuery } from './query/get-profile-user.query';
 
 
 @Injectable()
@@ -76,4 +79,22 @@ export class UsersService {
       new ChangingPasswordUserCommand(changingPasswordUserDto)
     )
   }
+
+  async updateProfileUserServiceHandler(updateUserProfileUserDto: UpdateUserProfileUserDto, request: Request): Promise<IUpdateProfileUser> {
+    return await this.commandBus.execute(
+      new UpdateProfileUserCommand(updateUserProfileUserDto, request)
+    )
+  }
+
+  //  ---------------------------------   GET QUERY CALLS ----------------------------------
+
+  async getProfileUserServiceHandler(request: Request): Promise<IGetProfileUser> {
+    return await this.queryBus.execute(
+      new GetProfileUserQuery(request)
+    )
+  }
+
+ 
+
+
 }

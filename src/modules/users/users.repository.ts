@@ -1,5 +1,5 @@
 import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser } from "./interface/res/user.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
 import { ResendForgetPasswordLinkUserDto } from "./dto/forget-password-link-user.dto";
@@ -28,6 +28,10 @@ import { LessThan, Repository } from "typeorm";
 import { Observable, from, map } from "rxjs";
 import * as moment from 'moment';
 import 'dotenv/config';
+import { UpdateUserProfileUserDto } from "./dto/update-profile-user.dto";
+import { DecryptToken } from "src/common/functions/decrypt-token";
+import { IDecryptWrapper } from "src/interface/base.response.interface";
+import { Request } from 'express';
 
 
 @Injectable()
@@ -49,8 +53,9 @@ export class UserRepository {
         @Inject(AuthService) private readonly authService: AuthService,
         @Inject(GenerateDigits) private readonly randomDigit: GenerateDigits,
         @Inject(UserConditions) private readonly userCondition: UserConditions,
-        @Inject(SendEmail) private readonly SendEmailService: SendEmail,
-        @Inject(UserValidation) private readonly UserValidationService: UserValidation
+        @Inject(SendEmail) private readonly sendEmailService: SendEmail,
+        @Inject(UserValidation) private readonly userValidationService: UserValidation,
+        @Inject(DecryptToken) private readonly decryptTokenService: DecryptToken
 
     ) { }
 
@@ -87,6 +92,16 @@ export class UserRepository {
         return await this.signIn(loginUserDto);
     }
 
+    async updateProfile(updateUserProfileUserDto: UpdateUserProfileUserDto, request: Request): Promise<any> {
+        return await this.updateProfileUser(updateUserProfileUserDto, request);
+    }
+
+    // -------------------- get calls-----------------------------
+    async getUpdateProfile(request: Request): Promise<any> {
+        return await this.getUserUpdateProfile(request)
+    }
+
+
 
     // --------------------------------- IMPLEMENTATION BUSSINESS LOGIC ---------------------------------------------------------
 
@@ -102,7 +117,7 @@ export class UserRepository {
 
             getUser = await this.userRepositoryR.findOne(getUserWhereClause); // finding user
 
-            validationError = this.UserValidationService.userExistsValidation(createUserDto, getUser); // validating user 
+            validationError = this.userValidationService.userExistsValidation(createUserDto, getUser); // validating user 
             if (validationError) return validationError
 
 
@@ -149,14 +164,14 @@ export class UserRepository {
 
         try {
 
-            validationError = this.UserValidationService.verficationLinkValidation(verificationLinkUserDto, undefined, undefined); // validating user
+            validationError = this.userValidationService.verficationLinkValidation(verificationLinkUserDto, undefined, undefined); // validating user
 
             if (validationError) return validationError
 
             getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole) // geting user condition
             getUser = await this.userRepositoryR.findOne(getUserWhereClause); // finding user
 
-            validationError = this.UserValidationService.verficationLinkValidation(verificationLinkUserDto, getUser, true);
+            validationError = this.userValidationService.verficationLinkValidation(verificationLinkUserDto, getUser, true);
 
             if (validationError) return validationError
 
@@ -179,14 +194,14 @@ export class UserRepository {
 
         try {
 
-            validationError = this.UserValidationService.verficationLinkValidation(verificationLinkUserDto);
+            validationError = this.userValidationService.verficationLinkValidation(verificationLinkUserDto);
 
             if (validationError) return validationError
 
             getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole)
             getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
-            validationError = this.UserValidationService.verficationLinkValidation(getUser);
+            validationError = this.userValidationService.verficationLinkValidation(getUser);
 
             if (validationError) return validationError
 
@@ -211,14 +226,14 @@ export class UserRepository {
         try {
 
 
-            validationError = this.UserValidationService.userForgetPasswordCodeValidation(forgetPasswordCodeUserDto);
+            validationError = this.userValidationService.userForgetPasswordCodeValidation(forgetPasswordCodeUserDto);
 
             if (validationError) return validationError
 
             getUserWhereClause = this.userCondition.usernameOrEmail(forgetPasswordCodeUserDto.email, undefined, forgetPasswordCodeUserDto.role as UserRole)
             getuser = await this.userRepositoryR.findOne(getUserWhereClause);
 
-            validationError = this.UserValidationService.userForgetPasswordCodeValidation(undefined, getuser, true);
+            validationError = this.userValidationService.userForgetPasswordCodeValidation(undefined, getuser, true);
 
             if (validationError) return validationError
 
@@ -258,14 +273,14 @@ export class UserRepository {
         try {
 
 
-            validationError = this.UserValidationService.userVerificationCodeValidation(verificationCodeUserDto);
+            validationError = this.userValidationService.userVerificationCodeValidation(verificationCodeUserDto);
 
             if (validationError) return validationError
 
             getUserWhereClause = this.userCondition.usernameOrEmail(verificationCodeUserDto.email, undefined, verificationCodeUserDto.role as UserRole)
             getuser = await this.userRepositoryR.findOne(getUserWhereClause);
 
-            validationError = this.UserValidationService.userVerificationCodeValidation(undefined, getuser, true);
+            validationError = this.userValidationService.userVerificationCodeValidation(undefined, getuser, true);
 
             if (validationError) return validationError
 
@@ -303,14 +318,14 @@ export class UserRepository {
             getuser: Partial<UserEntity>, hashResetPassword: string;
         try {
 
-            validationError = this.UserValidationService.userResetPasswordValidation(resetPasswordUserDto, undefined, false);
+            validationError = this.userValidationService.userResetPasswordValidation(resetPasswordUserDto, undefined, false);
 
             if (validationError) return validationError
 
             getUserWhereClause = this.userCondition.usernameOrEmail(resetPasswordUserDto.email, undefined, resetPasswordUserDto.role as UserRole)
             getuser = await this.userRepositoryR.findOne(getUserWhereClause);
 
-            validationError = this.UserValidationService.userResetPasswordValidation(undefined, getuser, true);
+            validationError = this.userValidationService.userResetPasswordValidation(undefined, getuser, true);
 
             if (validationError) return validationError
 
@@ -333,7 +348,7 @@ export class UserRepository {
             isOldPassword: boolean, hashPassword: string;
         try {
 
-            validationError = this.UserValidationService.userResetPasswordValidation(changingPasswordUserDto, undefined, false);
+            validationError = this.userValidationService.userResetPasswordValidation(changingPasswordUserDto, undefined, false);
 
             if (validationError) return validationError
 
@@ -341,7 +356,7 @@ export class UserRepository {
             getuser = await this.userRepositoryR.findOne(getUserWhereClause);
 
 
-            validationError = this.UserValidationService.userResetPasswordValidation(undefined, getuser, true);
+            validationError = this.userValidationService.userResetPasswordValidation(undefined, getuser, true);
 
             if (validationError) return validationError
 
@@ -373,7 +388,7 @@ export class UserRepository {
             getUserWhereClause = this.userCondition.usernameOrEmail(loginUserDto.email, loginUserDto.userName, loginUserDto.role as UserRole);
             getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
-            validationError = this.UserValidationService.loginUserValidation(getUser, loginUserDto);
+            validationError = this.userValidationService.loginUserValidation(getUser, loginUserDto);
             if (validationError) return validationError
 
             checkingUserPassword = await this.authService.comparePasswords(loginUserDto.password, getUser.password);
@@ -396,12 +411,51 @@ export class UserRepository {
         return response
     }
 
+    private async updateProfileUser(updateUserProfileUserDto: UpdateUserProfileUserDto, request: Request): Promise<IUpdateProfileUser> {
+        let response: IUpdateProfileUser, decryptResponse: IDecryptWrapper;
+        try {
+
+            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            await this.userRepositoryW.update({ id: decryptResponse.userId }, updateUserProfileUserDto)
+            response = responseHandler(null, "Your Profile Is Updated ", Status.SUCCESS, StatusCodes.SUCCESS);
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+        return response
+    }
+
+    // ----------------------------------------    GET CALLS LOGICS  ------------------------------------------
+
+    private async getUserUpdateProfile(request: Request): Promise<IGetProfileUser> {
+        let response: IGetProfileUser, decryptResponse: IDecryptWrapper, result: Partial<UserEntity[]>;
+
+        try {
+            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+
+            result = await this.userRepositoryR.find({ where: { id: decryptResponse.userId } })
+
+            response = responseHandler(result, "Your Profile ", Status.SUCCESS, StatusCodes.SUCCESS);
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+        return response
+    }
+
+   
+
+
+
 
     findOne(userName: string, email: string, role: UserRole): Observable<Partial<UserEntity>> {
         return from(this.userRepositoryR.findOne({ where: [{ userName, role }, { email, role }] })).pipe(
             map((user: UserEntity) => {
-                const { password, ...result } = user;
-                return result;
+                if (user) {
+                    const { password, ...result } = user;
+                    return result;
+                }
+                return user
             })
         )
     }
