@@ -1,5 +1,5 @@
-import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
 import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser } from "./interface/res/user.interface";
+import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
 import { ResendForgetPasswordLinkUserDto } from "./dto/forget-password-link-user.dto";
@@ -7,9 +7,12 @@ import { UserVerificationCodeEntity } from "./entities/user-verfication-code.ent
 import { VerificationCodeUserDto } from "./dto/checking-verification-code-user.dto";
 import { ChangingPasswordUserDto } from "./dto/changing-password-user.dto";
 import { VerificationLinkUserDto } from "./dto/verification-link-user.dto";
+import { UpdateUserProfileUserDto } from "./dto/update-profile-user.dto";
+import { IDecryptWrapper } from "src/interface/base.response.interface";
 import { GenerateDigits } from "src/common/functions/generate-digits";
 import { UserConditions } from "src/common/functions/user-condition";
 import { ResetPasswordUserDto } from "./dto/reset-password-user.dto";
+import { DecryptToken } from "src/common/functions/decrypt-token";
 import { responseHandler } from "src/helpers/response-handler";
 import { StatusCodes } from "../../common/enums/status-codes";
 import { UserSignUpType } from "src/common/enums/signup-type";
@@ -25,13 +28,9 @@ import { AuthService } from "../auth/auth.service";
 import { UserMapper } from "./mapper/user.mapper";
 import { Status } from "src/common/enums/status";
 import { LessThan, Repository } from "typeorm";
-import { Observable, from, map } from "rxjs";
+import { Request } from 'express';
 import * as moment from 'moment';
 import 'dotenv/config';
-import { UpdateUserProfileUserDto } from "./dto/update-profile-user.dto";
-import { DecryptToken } from "src/common/functions/decrypt-token";
-import { IDecryptWrapper } from "src/interface/base.response.interface";
-import { Request } from 'express';
 
 
 @Injectable()
@@ -442,24 +441,6 @@ export class UserRepository {
         }
         return response
     }
-
-   
-
-
-
-
-    findOne(userName: string, email: string, role: UserRole): Observable<Partial<UserEntity>> {
-        return from(this.userRepositoryR.findOne({ where: [{ userName, role }, { email, role }] })).pipe(
-            map((user: UserEntity) => {
-                if (user) {
-                    const { password, ...result } = user;
-                    return result;
-                }
-                return user
-            })
-        )
-    }
-
 
 
 
