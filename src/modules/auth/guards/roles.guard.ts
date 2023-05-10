@@ -1,24 +1,23 @@
-import { Injectable, CanActivate, ExecutionContext, Inject, forwardRef } from "@nestjs/common";
+import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
 import { AuthService } from "../auth.service";
-import { UserRepository } from "src/modules/users/users.repository";
 import { IDecryptWrapper } from "src/interface/base.response.interface";
 import { UserEntity } from "src/modules/users/entities/user.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { UserRole } from "src/common/enums/user-role";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
     constructor(
         private reflector: Reflector,
-
-        @Inject(forwardRef(() => UserRepository))
-        private UserRepository: UserRepository,
+        @InjectRepository(UserEntity, process.env.CONNECTION_NAME_2)
+        private readonly userRepositoryR: Repository<UserEntity>,
         private authService: AuthService
 
     ) { }
 
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
+    async canActivate(context: ExecutionContext) {
         const roles = this.reflector.get<string[]>('roles', context.getHandler());
 
         if (!roles) {
@@ -30,16 +29,29 @@ export class RolesGuard implements CanActivate {
 
         let decryptToken: IDecryptWrapper = this.authService.decodeJWT(consumerToken) as IDecryptWrapper
 
+        try {
 
-        return this.UserRepository.findOne(decryptToken.userName, decryptToken.email, decryptToken.role).pipe(
-            map((user: UserEntity) => {
-                const hasRole = () => roles.indexOf(user.role) > -1;
+            let UserResult: Partial<UserEntity> = await this.userRepositoryR.findOne({
+                where: [
+                    { userName: decryptToken.userName, role: decryptToken.role as UserRole },
+                    { email: decryptToken.email, role: decryptToken.role as UserRole }]
+            });
+
+            if (UserResult) {
+                const hasRole = () => roles.indexOf(UserResult.role) > -1;
                 let hasPermission: boolean = false;
                 if (hasRole()) {
                     hasPermission = true;
                 };
-                return user && hasPermission;
-            })
-        )
+                return UserResult && hasPermission;
+            } else {
+                return UserResult && false
+            }
+
+        } catch (error) {
+            return false
+
+        }
+
     }
 }

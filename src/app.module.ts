@@ -13,6 +13,7 @@ import { Module, Scope } from '@nestjs/common';
 import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bull';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { CategoryModule } from './modules/category/category.module';
 
 
 @Module({
@@ -43,6 +44,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     DatabaseModule.forRoot({ entities: entitiesList }),
 
     UsersModule,
+    CategoryModule,
 
   ],
   controllers: [AppController],

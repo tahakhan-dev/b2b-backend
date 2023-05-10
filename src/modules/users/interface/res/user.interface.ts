@@ -50,3 +50,18 @@ export interface IChangingPasswordUser {
     Result?: Partial<UserEntity[]>
     Message?: string
 }
+
+export interface IUpdateProfileUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<UserEntity[]>
+    Message?: string
+}
+
+export interface IGetProfileUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<UserEntity[]>
+    Message?: string
+}
+
