@@ -19,6 +19,7 @@ import { Response, Request } from 'express';
 import { UpdateUserProfileUserDto } from './dto/update-profile-user.dto';
 import { AddUserBusinessesDto } from './dto/add-user-businesses.dto';
 import { UpdateUserBusinessesDto } from './dto/update-businesses-user.dto';
+import { DeleteUserBusinessesDto } from './dto/delete-businesses-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -216,6 +217,25 @@ export class UsersController {
     try {
       const updateUserBusiness = await this.usersService.updateBusinessesUserServiceHandler(updateUserBusinessesDto, request);
       res.status(Number(updateUserBusiness.StatusCode)).json(updateUserBusiness)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('delete_user_businesses')
+  async deleteUserBusinesses(@Res() res: Response, @Req() request: Request, @Body() deleteUserBusinessesDto: DeleteUserBusinessesDto): Promise<IUpdateBusinessUser> {
+
+    try {
+      const deleteUserBusiness = await this.usersService.deleteBusinessesUserServiceHandler(deleteUserBusinessesDto, request);
+      res.status(Number(deleteUserBusiness.StatusCode)).json(deleteUserBusiness)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,

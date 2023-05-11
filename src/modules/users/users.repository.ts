@@ -1,5 +1,5 @@
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser } from "./interface/res/user.interface";
-import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser, IDeleteBusinessUser } from "./interface/res/user.interface";
+import { IDeleteConditon, IUpdateByIdAndUserId, IUpdateByUserIdAndIsActive, IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
 import { ResendForgetPasswordLinkUserDto } from "./dto/forget-password-link-user.dto";
@@ -8,6 +8,7 @@ import { VerificationCodeUserDto } from "./dto/checking-verification-code-user.d
 import { UpdateUserBusinessesDto } from "./dto/update-businesses-user.dto";
 import { ChangingPasswordUserDto } from "./dto/changing-password-user.dto";
 import { VerificationLinkUserDto } from "./dto/verification-link-user.dto";
+import { DeleteUserBusinessesDto } from "./dto/delete-businesses-user.dto";
 import { UserBusinessesEntity } from "./entities/user-businesses.entity";
 import { UpdateUserProfileUserDto } from "./dto/update-profile-user.dto";
 import { IDecryptWrapper } from "src/interface/base.response.interface";
@@ -105,11 +106,15 @@ export class UserRepository {
     }
 
     async addBusinessesUser(addUserBusinessesDto: AddUserBusinessesDto, request: Request): Promise<any> {
-        return await this.addBusinessProfileUser(addUserBusinessesDto, request);
+        return await this.addUserBusiness(addUserBusinessesDto, request);
     }
 
     async updateBusinessesUser(updateUserBusinessesDto: UpdateUserBusinessesDto, request: Request): Promise<any> {
-        return await this.updateBusinessProfileUser(updateUserBusinessesDto, request);
+        return await this.updateUserBusiness(updateUserBusinessesDto, request);
+    }
+
+    async deleteBusinessesUser(deleteUserBusinessesDto: DeleteUserBusinessesDto, request: Request): Promise<any> {
+        return await this.deleteUserBusiness(deleteUserBusinessesDto, request);
     }
 
     // -------------------- get calls-----------------------------
@@ -176,7 +181,7 @@ export class UserRepository {
 
     private async sendVerificationLink(verificationLinkUserDto: VerificationLinkUserDto): Promise<IVerificationLinkUser> {
         let response: IVerificationLinkUser, randomNumber: number, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail,
-            getUser: UserEntity, validationError: IVerificationLinkUser, verficationMapper: UserVerificationCodeEntity
+            getUser: UserEntity, validationError: IVerificationLinkUser, verficationMapper: UserVerificationCodeEntity, updateUserCondition: IUpdateByUserIdAndIsActive, deleteConditon: IDeleteConditon
 
         try {
 
@@ -193,8 +198,9 @@ export class UserRepository {
 
             randomNumber = this.randomDigit.generateRandomDigits(5);
             verficationMapper = this.mapper.createVerificationObj(getUser.id, randomNumber)
-
-            await this.userVerificationCodeRepositoryW.update({ userId: getUser.id, isActive: true }, { isActive: false, isDeleted: true })
+            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getUser.id, true);
+            deleteConditon = this.userCondition.deleteCondition()
+            await this.userVerificationCodeRepositoryW.update(updateUserCondition, deleteConditon)
             await this.userVerificationCodeRepositoryW.save(verficationMapper)
 
             response = responseHandler(null, "Verfication link send ", Status.SUCCESS, StatusCodes.SUCCESS)
@@ -206,7 +212,7 @@ export class UserRepository {
 
     private async resendForgetPasswordLink(verificationLinkUserDto: ResendForgetPasswordLinkUserDto): Promise<IVerificationLinkUser> {
         let response: IVerificationLinkUser, randomNumber: number, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail,
-            getUser: UserEntity, validationError: IVerificationLinkUser, verficationMapper: UserVerificationCodeEntity
+            getUser: UserEntity, validationError: IVerificationLinkUser, verficationMapper: UserVerificationCodeEntity, updateUserCondition: IUpdateByUserIdAndIsActive, deleteConditon: IDeleteConditon
 
         try {
 
@@ -224,7 +230,10 @@ export class UserRepository {
             randomNumber = this.randomDigit.generateRandomDigits(5);
             verficationMapper = this.mapper.createVerificationObj(getUser.id, randomNumber)
 
-            await this.UserForgetPasswordRepositoryW.update({ userId: getUser.id, isActive: true }, { isActive: false, isDeleted: true })
+            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getUser.id, true);
+            deleteConditon = this.userCondition.deleteCondition()
+
+            await this.UserForgetPasswordRepositoryW.update(updateUserCondition, deleteConditon)
             await this.UserForgetPasswordRepositoryW.save(verficationMapper)
 
             response = responseHandler(null, "ForgerPassword link send ", Status.SUCCESS, StatusCodes.SUCCESS)
@@ -236,10 +245,10 @@ export class UserRepository {
 
     private async checkingForgetPasswordUserCode(forgetPasswordCodeUserDto: ForgetPasswordCodeUserDto): Promise<IForgetPasswordCodeUser> {
         let response: IForgetPasswordCodeUser, validationError: IForgetPasswordCodeUser, getuser: Partial<UserEntity>,
-            getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUsercode: Partial<UserForgetPasswordCodeEntity>, getVerificationCode: IUserCodeByUserId;
+            getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUsercode: Partial<UserForgetPasswordCodeEntity>,
+            getVerificationCode: IUserCodeByUserId, deleteConditon: IDeleteConditon, updateUserCondition: IUpdateByUserIdAndIsActive
 
         try {
-
 
             validationError = this.userValidationService.userForgetPasswordCodeValidation(forgetPasswordCodeUserDto);
 
@@ -252,7 +261,6 @@ export class UserRepository {
 
             if (validationError) return validationError
 
-
             getVerificationCode = this.userCondition.getUserCodeByUserId(getuser.id, forgetPasswordCodeUserDto.code)
             getUsercode = await this.UserForgetPasswordRepositoryR.findOne(getVerificationCode);
 
@@ -261,19 +269,19 @@ export class UserRepository {
             const currentDate = moment.utc();
 
             const diffInMinutes: number = currentDate.diff(moment.utc(getUsercode.tokenCreationDate), 'minutes');
+            deleteConditon = this.userCondition.deleteCondition()
+            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getuser.id, true);
 
             if (diffInMinutes > 10) {
                 // storedDate is expired
-                await this.UserForgetPasswordRepositoryW.update({ userId: getuser.id, isActive: true, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, { isActive: false, isDeleted: true })
+                await this.UserForgetPasswordRepositoryW.update({ ...updateUserCondition, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, deleteConditon)
                 response = responseHandler(null, "code has expired. Please request a new code and try again", Status.SUCCESS, StatusCodes.BAD_REQUEST)
             } else {
                 // storedDate is still valid
-                await this.UserForgetPasswordRepositoryW.update({ userId: getuser.id, isActive: true }, { isActive: false, isDeleted: true })
+                await this.UserForgetPasswordRepositoryW.update(updateUserCondition, deleteConditon)
                 response = responseHandler(null, "Your User has Been Verified ", Status.SUCCESS, StatusCodes.SUCCESS)
             }
-
             return response
-
 
         } catch (error) {
             response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
@@ -283,7 +291,8 @@ export class UserRepository {
 
     private async checkingVerificationUserCode(verificationCodeUserDto: VerificationCodeUserDto): Promise<IVerificationCodeUser> {
         let response: IVerificationCodeUser, validationError: IVerificationCodeUser, getuser: Partial<UserEntity>,
-            getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUsercode: Partial<UserVerificationCodeEntity>, getVerificationCode: IUserCodeByUserId;
+            getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUsercode: Partial<UserVerificationCodeEntity>,
+            getVerificationCode: IUserCodeByUserId, deleteConditon: IDeleteConditon, updateUserCondition: IUpdateByUserIdAndIsActive;
 
         try {
 
@@ -308,14 +317,16 @@ export class UserRepository {
             const currentDate = moment.utc();
 
             const diffInMinutes: number = currentDate.diff(moment.utc(getUsercode.tokenCreationDate), 'minutes');
+            deleteConditon = this.userCondition.deleteCondition()
+            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getuser.id, true);
 
             if (diffInMinutes > 10) {
                 // storedDate is expired
-                await this.userVerificationCodeRepositoryW.update({ userId: getuser.id, isActive: true, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, { isActive: false, isDeleted: true })
+                await this.userVerificationCodeRepositoryW.update({ ...updateUserCondition, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, deleteConditon)
                 response = responseHandler(null, "code has expired. Please request a new code and try again", Status.SUCCESS, StatusCodes.BAD_REQUEST)
             } else {
                 // storedDate is still valid
-                await this.userVerificationCodeRepositoryW.update({ userId: getuser.id, isActive: true }, { isActive: false, isDeleted: true })
+                await this.userVerificationCodeRepositoryW.update(updateUserCondition, deleteConditon)
                 await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { emailVerified: true })
                 response = responseHandler(null, "Your User has Been Verified ", Status.SUCCESS, StatusCodes.SUCCESS)
             }
@@ -330,7 +341,7 @@ export class UserRepository {
 
     private async resetUserPassword(resetPasswordUserDto: ResetPasswordUserDto): Promise<IResetPasswordUser> {
         let response: IResetPasswordUser, validationError: IResetPasswordUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail,
-            getuser: Partial<UserEntity>, hashResetPassword: string;
+            getuser: Partial<UserEntity>, hashResetPassword: string, updateUserCondition: IUpdateByUserIdAndIsActive;
         try {
 
             validationError = this.userValidationService.userResetPasswordValidation(resetPasswordUserDto, undefined, false);
@@ -345,6 +356,7 @@ export class UserRepository {
             if (validationError) return validationError
 
             hashResetPassword = await this.authService.hashPassword(resetPasswordUserDto.password);
+            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getuser.id, true);
 
             await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { password: hashResetPassword });
 
@@ -360,7 +372,7 @@ export class UserRepository {
 
     private async changingUserPassword(changingPasswordUserDto: ChangingPasswordUserDto): Promise<IChangingPasswordUser> {
         let response: IChangingPasswordUser, validationError: IChangingPasswordUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getuser: Partial<UserEntity>,
-            isOldPassword: boolean, hashPassword: string;
+            isOldPassword: boolean, hashPassword: string, updateUserCondition: IUpdateByUserIdAndIsActive;
         try {
 
             validationError = this.userValidationService.userResetPasswordValidation(changingPasswordUserDto, undefined, false);
@@ -381,6 +393,7 @@ export class UserRepository {
             if (isOldPassword) return responseHandler(null, "This is your old password enter new password ", Status.SUCCESS, StatusCodes.BAD_REQUEST);
 
             hashPassword = await this.authService.hashPassword(changingPasswordUserDto.newPassword);
+            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getuser.id, true);
 
             await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { password: hashPassword });
 
@@ -439,7 +452,7 @@ export class UserRepository {
         return response
     }
 
-    private async addBusinessProfileUser(addUserBusinessesDto: AddUserBusinessesDto, request: Request): Promise<IAddBusinessUser> {
+    private async addUserBusiness(addUserBusinessesDto: AddUserBusinessesDto, request: Request): Promise<IAddBusinessUser> {
         let response: IAddBusinessUser, decryptResponse: IDecryptWrapper, userBusinessMapper: UserBusinessesEntity;
         try {
 
@@ -456,15 +469,35 @@ export class UserRepository {
         return response
     }
 
-    private async updateBusinessProfileUser(updateUserBusinessesDto: UpdateUserBusinessesDto, request: Request): Promise<IUpdateBusinessUser> {
-        let response: IUpdateBusinessUser, updateUserBusinessMapper: UserBusinessesEntity;
+    private async updateUserBusiness(updateUserBusinessesDto: UpdateUserBusinessesDto, request: Request): Promise<IUpdateBusinessUser> {
+        let response: IUpdateBusinessUser, updateUserBusinessMapper: UserBusinessesEntity, decryptResponse: IDecryptWrapper, updateByUserIdAndId: IUpdateByIdAndUserId;
         try {
 
+            decryptResponse = this.decryptTokenService.decryptUserToken(request);
             updateUserBusinessMapper = this.mapper.UpdateUserBusinessObj(updateUserBusinessesDto);
+            updateByUserIdAndId = this.userCondition.updateByIdAndUserId(updateUserBusinessesDto.id, decryptResponse.userId)
 
-            await this.UserBusinessesRepositoryW.update({ id: updateUserBusinessesDto.id }, updateUserBusinessMapper)
+            await this.UserBusinessesRepositoryW.update(updateByUserIdAndId, updateUserBusinessMapper)
 
             response = responseHandler(null, "User Business Update", Status.SUCCESS, StatusCodes.SUCCESS);
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+        return response
+    }
+
+    private async deleteUserBusiness(deleteUserBusinessesDto: DeleteUserBusinessesDto, request: Request): Promise<IDeleteBusinessUser> {
+        let response: IUpdateBusinessUser, decryptResponse: IDecryptWrapper, updateByUserIdAndId: IUpdateByIdAndUserId, isDeleted: IDeleteConditon;
+        try {
+
+            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            updateByUserIdAndId = this.userCondition.updateByIdAndUserId(deleteUserBusinessesDto.id, decryptResponse.userId)
+            isDeleted = this.userCondition.deleteCondition()
+
+            await this.UserBusinessesRepositoryW.update(updateByUserIdAndId, isDeleted)
+
+            response = responseHandler(null, "User Business Deleted", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
             response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)

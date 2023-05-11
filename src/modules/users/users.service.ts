@@ -1,4 +1,4 @@
-import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser, IDeleteBusinessUser } from './interface/res/user.interface';
 import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpassword-link-user.command';
 import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
 import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
@@ -26,6 +26,8 @@ import { Request } from 'express';
 import 'dotenv/config';
 import { UpdateUserBusinessesDto } from './dto/update-businesses-user.dto';
 import { UpdateBusinessesUserCommand } from './commands/update-businesses-user.command';
+import { DeleteBusinessesUserCommand } from './commands/delete-businesses-user.command';
+import { DeleteUserBusinessesDto } from './dto/delete-businesses-user.dto';
 
 
 @Injectable()
@@ -99,6 +101,12 @@ export class UsersService {
   async updateBusinessesUserServiceHandler(updateUserBusinessesDto: UpdateUserBusinessesDto, request: Request): Promise<IUpdateBusinessUser> {
     return await this.commandBus.execute(
       new UpdateBusinessesUserCommand(updateUserBusinessesDto, request)
+    )
+  }
+
+  async deleteBusinessesUserServiceHandler(deleteUserBusinessesDto: DeleteUserBusinessesDto, request: Request): Promise<IDeleteBusinessUser> {
+    return await this.commandBus.execute(
+      new DeleteBusinessesUserCommand(deleteUserBusinessesDto, request)
     )
   }
 

@@ -29,3 +29,15 @@ export interface IUserCodeByUserId {
     where: { userId: number, verificationCode: number, isActive: boolean }
 }
 
+export interface IUpdateByIdAndUserId {
+    id: number, userId: number
+}
+
+export interface IUpdateByUserIdAndIsActive {
+    id: number, isActive: boolean
+}
+
+export interface IDeleteConditon {
+    isActive: boolean, isDeleted: boolean
+}
+
