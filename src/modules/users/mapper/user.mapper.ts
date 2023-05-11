@@ -5,6 +5,9 @@ import { CreateUserDto } from "../dto/create-user.dto";
 import { UserRole } from "src/common/enums/user-role";
 import { UserEntity } from "../entities/user.entity";
 import { Injectable } from "@nestjs/common";
+import { IDecryptWrapper } from "src/interface/base.response.interface";
+import { UserBusinessesDto } from "../dto/user-businesses.dto";
+import { UserBusinessesEntity } from "../entities/user-businesses.entity";
 import * as moment from 'moment';
 
 
@@ -39,5 +42,23 @@ export class UserMapper {
             verifObj.tokenCreationDate = formattedDate
 
         return verifObj
+    }
+
+    createUserBusinessObj(decryptResponse: IDecryptWrapper, userBusinessesDto: UserBusinessesDto): UserBusinessesEntity {
+        const userBusinessObj = new UserBusinessesEntity();
+        userBusinessObj.userId = decryptResponse?.userId;
+        userBusinessObj.businessTypeId = userBusinessesDto?.businessTypeId;
+        userBusinessObj.businessContactInfromation = userBusinessesDto?.businessContactInfromation ?? null;
+        userBusinessObj.businessLocations = userBusinessesDto?.businessLocations ?? null
+        userBusinessObj.businessPhoneNumber = userBusinessesDto?.businessPhoneNumber ?? null
+        userBusinessObj.businessDescription = userBusinessesDto?.businessDescription ?? null;
+        userBusinessObj.headquarters = userBusinessesDto?.headquarters ?? null;
+        userBusinessObj.sysId = userBusinessesDto?.sysId ?? null;
+        userBusinessObj.businessEmail = userBusinessesDto?.businessEmail ?? null;
+        userBusinessObj.businessName = userBusinessesDto?.businessName ?? null
+        userBusinessObj.isActive = true
+        userBusinessObj.isDeleted = false
+
+        return userBusinessObj
     }
 }

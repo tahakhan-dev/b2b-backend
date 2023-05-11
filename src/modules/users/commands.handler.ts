@@ -1,5 +1,5 @@
 import { CommandHandler, EventPublisher, ICommandHandler } from "@nestjs/cqrs";
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser,IBusinessUser } from "./interface/res/user.interface";
 import { CreateUserCommand } from "./commands/create-user.command";
 import { LoginUserCommand } from "./commands/login-user.command";
 import { UserRepository } from "./users.repository";
@@ -10,6 +10,7 @@ import { VerificationCodeUserCommand } from "./commands/verification-code-user.c
 import { ResendForgetPasswordLinkCommand } from "./commands/resend-forgetpassword-link-user.command";
 import { ChangingPasswordUserCommand } from "./commands/changing-password-user.command";
 import { UpdateProfileUserCommand } from "./commands/update-profile-user.command";
+import { BusinessesUserCommand } from "./commands/businesses-user.command";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
@@ -155,6 +156,22 @@ export class UpdateProfileUserCommandHandler implements ICommandHandler<UpdatePr
     async execute(command: UpdateProfileUserCommand, resolve: (value?) => void): Promise<IUpdateProfileUser> {
         const updateProfile = this.publisher.mergeObjectContext(
             await this.userRepo.updateProfile(command.updateUserProfileUserDto, command.request),
+        );
+        return updateProfile;
+    }
+}
+
+@CommandHandler(BusinessesUserCommand)
+export class BusinessesUserCommandHandler implements ICommandHandler<BusinessesUserCommand> {
+    constructor(
+        private readonly userRepo: UserRepository,
+        private readonly publisher: EventPublisher,
+    ) { }
+
+    // @ts-ignore
+    async execute(command: BusinessesUserCommand, resolve: (value?) => void): Promise<IBusinessUser> {
+        const updateProfile = this.publisher.mergeObjectContext(
+            await this.userRepo.businessesUser(command.userBusinessesDto, command.request),
         );
         return updateProfile;
     }

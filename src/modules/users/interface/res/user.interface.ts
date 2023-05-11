@@ -65,3 +65,26 @@ export interface IGetProfileUser {
     Message?: string
 }
 
+
+export interface IBusinessUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<BusinessUserResult[]>
+    Message?: string
+}
+
+export interface BusinessUserResult{
+    id: number,
+    userId:number,
+    businessContactInfromation:string,
+    businessDescription:string,
+    businessLocations:string,
+    headquarters:string,
+    businessEmail:string,
+    businessPhoneNumber:string,
+    sysId:string
+    isActive: boolean,
+    isDeleted: boolean,
+    serverCreatedOn: Date,
+    serverUpdatedOn: Date
+}

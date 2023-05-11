@@ -1,4 +1,4 @@
-import { ChangingPasswordUserCommandHandler, CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, UpdateProfileUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
+import { BusinessesUserCommandHandler, ChangingPasswordUserCommandHandler, CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, UpdateProfileUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserForgetPasswordCodeEntity } from './entities/user-forgetpassword-verfication.entity';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
@@ -16,14 +16,15 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
 import { DecryptToken } from 'src/common/functions/decrypt-token';
 import { GetProfileUserQueryHandler } from './query.handler';
+import { UserBusinessesEntity } from './entities/user-businesses.entity';
 import 'dotenv/config';
 
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity]),
-    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity], process.env.CONNECTION_NAME_2),
+    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, UserBusinessesEntity]),
+    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, UserBusinessesEntity], process.env.CONNECTION_NAME_2),
     AuthModule
   ],
   controllers: [UsersController],
@@ -46,6 +47,7 @@ import 'dotenv/config';
     VerificationCodeUserCommandHandler,
     ChangingPasswordUserCommandHandler,
     UpdateProfileUserCommandHandler,
+    BusinessesUserCommandHandler,
     //------ Query Handler
     GetProfileUserQueryHandler
   ],
