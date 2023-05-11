@@ -1,17 +1,19 @@
-import { Module, Scope } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule as EnvConfigModule } from '@nestjs/config';
-import { BullModule } from '@nestjs/bull';
-import { DatabaseModule } from './modules/databaseModule/database/database.module';
-import { entitiesList } from './entitiesList/entities.list';
-import { ShutdownService } from './shutdown.service';
 import { MicroServiceHealthCheckService } from './microservice-health-check.service';
+import { DatabaseModule } from './modules/databaseModule/database/database.module';
 import { CalculationProcessor } from './utils/workerThreads/calculation.processor';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './utils/interceptor/logging.interceptor';
 import { HttpExceptionFilter } from './utils/filters/http-exeception.filter';
+import { ConfigModule as EnvConfigModule } from '@nestjs/config';
+import { entitiesList } from './entitiesList/entities.list';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { UsersModule } from './modules/users/users.module';
+import { ShutdownService } from './shutdown.service';
+import { AppController } from './app.controller';
+import { Module, Scope } from '@nestjs/common';
+import { AppService } from './app.service';
+import { BullModule } from '@nestjs/bull';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { CategoryModule } from './modules/category/category.module';
 
 
 @Module({
@@ -28,10 +30,21 @@ import { UsersModule } from './modules/users/users.module';
       name: 'calculation',
     }),
 
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_SMTP,
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      }
+    }),
+
     // Module listing
     DatabaseModule.forRoot({ entities: entitiesList }),
 
     UsersModule,
+    CategoryModule,
 
   ],
   controllers: [AppController],

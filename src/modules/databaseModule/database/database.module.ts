@@ -1,10 +1,10 @@
-import { Module, DynamicModule } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConfigDBData } from '../config/config.interface';
-import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
-import { DbConfig } from './db.interface';
+import { ConfigModule } from '../config/config.module';
+import { Module, DynamicModule } from '@nestjs/common';
 import { DbConfigError } from './db.error';
+import { DbConfig } from './db.interface';
 import 'dotenv/config';
 
 @Module({})

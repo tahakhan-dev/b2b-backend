@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigData, ConfigDBData } from './config.interface';
 import { DEFAULT_CONFIG, DEFAULT_CONFIG_2 } from './config.default';
+import { ConfigData, ConfigDBData } from './config.interface';
+import { Injectable } from '@nestjs/common';
 import 'dotenv/config';
 
 @Injectable()

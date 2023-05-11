@@ -16,7 +16,7 @@ users:
 user_businesses: 
     user id
     business name
-    business type
+    business type   ----------------> under garments , clothing  etc 
     business contact information
     business description 
     business locations 
