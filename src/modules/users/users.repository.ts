@@ -1,17 +1,20 @@
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IBusinessUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser } from "./interface/res/user.interface";
 import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
 import { ResendForgetPasswordLinkUserDto } from "./dto/forget-password-link-user.dto";
 import { UserVerificationCodeEntity } from "./entities/user-verfication-code.entity";
 import { VerificationCodeUserDto } from "./dto/checking-verification-code-user.dto";
+import { UpdateUserBusinessesDto } from "./dto/update-businesses-user.dto";
 import { ChangingPasswordUserDto } from "./dto/changing-password-user.dto";
 import { VerificationLinkUserDto } from "./dto/verification-link-user.dto";
+import { UserBusinessesEntity } from "./entities/user-businesses.entity";
 import { UpdateUserProfileUserDto } from "./dto/update-profile-user.dto";
 import { IDecryptWrapper } from "src/interface/base.response.interface";
 import { GenerateDigits } from "src/common/functions/generate-digits";
 import { UserConditions } from "src/common/functions/user-condition";
 import { ResetPasswordUserDto } from "./dto/reset-password-user.dto";
+import { AddUserBusinessesDto } from "./dto/add-user-businesses.dto";
 import { DecryptToken } from "src/common/functions/decrypt-token";
 import { responseHandler } from "src/helpers/response-handler";
 import { StatusCodes } from "../../common/enums/status-codes";
@@ -31,8 +34,6 @@ import { LessThan, Repository } from "typeorm";
 import { Request } from 'express';
 import * as moment from 'moment';
 import 'dotenv/config';
-import { UserBusinessesDto } from "./dto/user-businesses.dto";
-import { UserBusinessesEntity } from "./entities/user-businesses.entity";
 
 
 @Injectable()
@@ -103,8 +104,12 @@ export class UserRepository {
         return await this.updateProfileUser(updateUserProfileUserDto, request);
     }
 
-    async businessesUser(userBusinessesDto: UserBusinessesDto, request: Request): Promise<any> {
-        return await this.businessProfileUser(userBusinessesDto, request);
+    async addBusinessesUser(addUserBusinessesDto: AddUserBusinessesDto, request: Request): Promise<any> {
+        return await this.addBusinessProfileUser(addUserBusinessesDto, request);
+    }
+
+    async updateBusinessesUser(updateUserBusinessesDto: UpdateUserBusinessesDto, request: Request): Promise<any> {
+        return await this.updateBusinessProfileUser(updateUserBusinessesDto, request);
     }
 
     // -------------------- get calls-----------------------------
@@ -189,7 +194,7 @@ export class UserRepository {
             randomNumber = this.randomDigit.generateRandomDigits(5);
             verficationMapper = this.mapper.createVerificationObj(getUser.id, randomNumber)
 
-            await this.userVerificationCodeRepositoryW.update({ userId: getUser.id }, { isActive: false, isDeleted: true })
+            await this.userVerificationCodeRepositoryW.update({ userId: getUser.id, isActive: true }, { isActive: false, isDeleted: true })
             await this.userVerificationCodeRepositoryW.save(verficationMapper)
 
             response = responseHandler(null, "Verfication link send ", Status.SUCCESS, StatusCodes.SUCCESS)
@@ -219,7 +224,7 @@ export class UserRepository {
             randomNumber = this.randomDigit.generateRandomDigits(5);
             verficationMapper = this.mapper.createVerificationObj(getUser.id, randomNumber)
 
-            await this.UserForgetPasswordRepositoryW.update({ userId: getUser.id }, { isActive: false, isDeleted: true })
+            await this.UserForgetPasswordRepositoryW.update({ userId: getUser.id, isActive: true }, { isActive: false, isDeleted: true })
             await this.UserForgetPasswordRepositoryW.save(verficationMapper)
 
             response = responseHandler(null, "ForgerPassword link send ", Status.SUCCESS, StatusCodes.SUCCESS)
@@ -259,11 +264,11 @@ export class UserRepository {
 
             if (diffInMinutes > 10) {
                 // storedDate is expired
-                await this.UserForgetPasswordRepositoryW.update({ userId: getuser.id, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, { isActive: false, isDeleted: true })
+                await this.UserForgetPasswordRepositoryW.update({ userId: getuser.id, isActive: true, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, { isActive: false, isDeleted: true })
                 response = responseHandler(null, "code has expired. Please request a new code and try again", Status.SUCCESS, StatusCodes.BAD_REQUEST)
             } else {
                 // storedDate is still valid
-                await this.UserForgetPasswordRepositoryW.update({ userId: getuser.id }, { isActive: false, isDeleted: true })
+                await this.UserForgetPasswordRepositoryW.update({ userId: getuser.id, isActive: true }, { isActive: false, isDeleted: true })
                 response = responseHandler(null, "Your User has Been Verified ", Status.SUCCESS, StatusCodes.SUCCESS)
             }
 
@@ -306,12 +311,12 @@ export class UserRepository {
 
             if (diffInMinutes > 10) {
                 // storedDate is expired
-                await this.userVerificationCodeRepositoryW.update({ userId: getuser.id, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, { isActive: false, isDeleted: true })
+                await this.userVerificationCodeRepositoryW.update({ userId: getuser.id, isActive: true, tokenCreationDate: LessThan(currentDate.format('YYYY-MM-DD HH:mm:ss')) }, { isActive: false, isDeleted: true })
                 response = responseHandler(null, "code has expired. Please request a new code and try again", Status.SUCCESS, StatusCodes.BAD_REQUEST)
             } else {
                 // storedDate is still valid
-                await this.userVerificationCodeRepositoryW.update({ userId: getuser.id }, { isActive: false, isDeleted: true })
-                await this.userRepositoryW.update({ id: getuser.id }, { emailVerified: true })
+                await this.userVerificationCodeRepositoryW.update({ userId: getuser.id, isActive: true }, { isActive: false, isDeleted: true })
+                await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { emailVerified: true })
                 response = responseHandler(null, "Your User has Been Verified ", Status.SUCCESS, StatusCodes.SUCCESS)
             }
 
@@ -341,7 +346,7 @@ export class UserRepository {
 
             hashResetPassword = await this.authService.hashPassword(resetPasswordUserDto.password);
 
-            await this.userRepositoryW.update({ id: getuser.id }, { password: hashResetPassword });
+            await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { password: hashResetPassword });
 
             response = responseHandler(null, "Your Password Is Changed ", Status.SUCCESS, StatusCodes.SUCCESS)
 
@@ -377,7 +382,7 @@ export class UserRepository {
 
             hashPassword = await this.authService.hashPassword(changingPasswordUserDto.newPassword);
 
-            await this.userRepositoryW.update({ id: getuser.id }, { password: hashPassword });
+            await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { password: hashPassword });
 
             response = responseHandler(null, "Your Password Is Changed ", Status.SUCCESS, StatusCodes.SUCCESS)
 
@@ -434,17 +439,32 @@ export class UserRepository {
         return response
     }
 
-
-    private async businessProfileUser(userBusinessesDto: UserBusinessesDto, request: Request): Promise<IBusinessUser> {
-        let response: IBusinessUser, decryptResponse: IDecryptWrapper, userBusinessMapper: UserBusinessesEntity;
+    private async addBusinessProfileUser(addUserBusinessesDto: AddUserBusinessesDto, request: Request): Promise<IAddBusinessUser> {
+        let response: IAddBusinessUser, decryptResponse: IDecryptWrapper, userBusinessMapper: UserBusinessesEntity;
         try {
 
             decryptResponse = this.decryptTokenService.decryptUserToken(request);
-            userBusinessMapper = this.mapper.createUserBusinessObj(decryptResponse, userBusinessesDto);
+            userBusinessMapper = this.mapper.createUserBusinessObj(decryptResponse, addUserBusinessesDto);
 
             await this.UserBusinessesRepositoryW.save(userBusinessMapper)
 
             response = responseHandler(null, "User Business Added", Status.SUCCESS, StatusCodes.SUCCESS);
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+        return response
+    }
+
+    private async updateBusinessProfileUser(updateUserBusinessesDto: UpdateUserBusinessesDto, request: Request): Promise<IUpdateBusinessUser> {
+        let response: IUpdateBusinessUser, updateUserBusinessMapper: UserBusinessesEntity;
+        try {
+
+            updateUserBusinessMapper = this.mapper.UpdateUserBusinessObj(updateUserBusinessesDto);
+
+            await this.UserBusinessesRepositoryW.update({ id: updateUserBusinessesDto.id }, updateUserBusinessMapper)
+
+            response = responseHandler(null, "User Business Update", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
             response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)

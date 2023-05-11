@@ -6,9 +6,10 @@ import { UserRole } from "src/common/enums/user-role";
 import { UserEntity } from "../entities/user.entity";
 import { Injectable } from "@nestjs/common";
 import { IDecryptWrapper } from "src/interface/base.response.interface";
-import { UserBusinessesDto } from "../dto/user-businesses.dto";
+import { AddUserBusinessesDto } from "../dto/add-user-businesses.dto";
 import { UserBusinessesEntity } from "../entities/user-businesses.entity";
 import * as moment from 'moment';
+import { UpdateUserBusinessesDto } from "../dto/update-businesses-user.dto";
 
 
 @Injectable()
@@ -44,21 +45,36 @@ export class UserMapper {
         return verifObj
     }
 
-    createUserBusinessObj(decryptResponse: IDecryptWrapper, userBusinessesDto: UserBusinessesDto): UserBusinessesEntity {
-        const userBusinessObj = new UserBusinessesEntity();
-        userBusinessObj.userId = decryptResponse?.userId;
-        userBusinessObj.businessTypeId = userBusinessesDto?.businessTypeId;
-        userBusinessObj.businessContactInfromation = userBusinessesDto?.businessContactInfromation ?? null;
-        userBusinessObj.businessLocations = userBusinessesDto?.businessLocations ?? null
-        userBusinessObj.businessPhoneNumber = userBusinessesDto?.businessPhoneNumber ?? null
-        userBusinessObj.businessDescription = userBusinessesDto?.businessDescription ?? null;
-        userBusinessObj.headquarters = userBusinessesDto?.headquarters ?? null;
-        userBusinessObj.sysId = userBusinessesDto?.sysId ?? null;
-        userBusinessObj.businessEmail = userBusinessesDto?.businessEmail ?? null;
-        userBusinessObj.businessName = userBusinessesDto?.businessName ?? null
-        userBusinessObj.isActive = true
-        userBusinessObj.isDeleted = false
+    createUserBusinessObj(decryptResponse: IDecryptWrapper, addUserBusinessesDto: AddUserBusinessesDto): UserBusinessesEntity {
+        const addUserBusinessObj = new UserBusinessesEntity();
+        addUserBusinessObj.userId = decryptResponse?.userId;
+        addUserBusinessObj.businessTypeId = addUserBusinessesDto?.businessTypeId;
+        addUserBusinessObj.businessContactInfromation = addUserBusinessesDto?.businessContactInfromation ?? null;
+        addUserBusinessObj.businessLocations = addUserBusinessesDto?.businessLocations ?? null
+        addUserBusinessObj.businessPhoneNumber = addUserBusinessesDto?.businessPhoneNumber ?? null
+        addUserBusinessObj.businessDescription = addUserBusinessesDto?.businessDescription ?? null;
+        addUserBusinessObj.headquarters = addUserBusinessesDto?.headquarters ?? null;
+        addUserBusinessObj.businessEmail = addUserBusinessesDto?.businessEmail ?? null;
+        addUserBusinessObj.businessName = addUserBusinessesDto?.businessName ?? null
+        addUserBusinessObj.isActive = true
+        addUserBusinessObj.isDeleted = false
+        addUserBusinessObj.sysId = addUserBusinessesDto?.sysId ?? false
 
-        return userBusinessObj
+        return addUserBusinessObj
+    }
+
+    UpdateUserBusinessObj(updateUserBusinessesDto: UpdateUserBusinessesDto): UserBusinessesEntity {
+        const updateUserBusinessObj = new UserBusinessesEntity();
+        updateUserBusinessObj.businessTypeId = updateUserBusinessesDto?.businessTypeId;
+        updateUserBusinessObj.businessName = updateUserBusinessesDto?.businessName ?? null
+        updateUserBusinessObj.businessContactInfromation = updateUserBusinessesDto?.businessContactInfromation ?? null;
+        updateUserBusinessObj.businessDescription = updateUserBusinessesDto?.businessDescription ?? null;
+        updateUserBusinessObj.businessLocations = updateUserBusinessesDto?.businessLocations ?? null
+        updateUserBusinessObj.headquarters = updateUserBusinessesDto?.headquarters ?? null;
+        updateUserBusinessObj.businessEmail = updateUserBusinessesDto?.businessEmail ?? null;
+        updateUserBusinessObj.businessPhoneNumber = updateUserBusinessesDto?.businessPhoneNumber ?? null
+        updateUserBusinessObj.sysId = updateUserBusinessesDto?.sysId ?? false
+
+        return updateUserBusinessObj
     }
 }

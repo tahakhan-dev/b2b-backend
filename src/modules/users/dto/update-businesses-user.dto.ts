@@ -1,13 +1,17 @@
 import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 
-export class UserBusinessesDto {
+export class UpdateUserBusinessesDto {
 
     @IsNumber()
     @IsNotEmpty()
+    id: number;
+
+    @IsNumber()
+    @IsOptional()
     businessTypeId: number;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
     businessName: string
 
@@ -36,7 +40,7 @@ export class UserBusinessesDto {
     @IsString()
     businessPhoneNumber: string
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsBoolean()
     sysId: boolean
 

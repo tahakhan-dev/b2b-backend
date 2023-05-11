@@ -1,29 +1,31 @@
-import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IBusinessUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser } from './interface/res/user.interface';
+import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpassword-link-user.command';
 import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
 import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
+import { AddBusinessesUserCommand } from './commands/add-businesses-user.command';
 import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
 import { CreateUserCommand } from './commands/create-user.command';
-import { LoginUserCommand } from './commands/login-user.command';
-import { CreateUserDto } from './dto/create-user.dto';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { LoginUserDto } from './dto/login-user.dto';
-import { Injectable } from '@nestjs/common';
 import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
 import { ResetPasswordUserCommand } from './commands/reset-password-user.command';
 import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
 import { VerificationCodeUserCommand } from './commands/verification-code-user.command';
 import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
-import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpassword-link-user.command';
 import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
 import { ChangingPasswordUserCommand } from './commands/changing-password-user.command';
 import { UpdateUserProfileUserDto } from './dto/update-profile-user.dto';
 import { UpdateProfileUserCommand } from './commands/update-profile-user.command';
+import { GetProfileUserQuery } from './query/get-profile-user.query';
+import { AddUserBusinessesDto } from './dto/add-user-businesses.dto';
+import { LoginUserCommand } from './commands/login-user.command';
+import { CreateUserDto } from './dto/create-user.dto';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { LoginUserDto } from './dto/login-user.dto';
+import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import 'dotenv/config';
-import { GetProfileUserQuery } from './query/get-profile-user.query';
-import { UserBusinessesDto } from './dto/user-businesses.dto';
-import { BusinessesUserCommand } from './commands/businesses-user.command';
+import { UpdateUserBusinessesDto } from './dto/update-businesses-user.dto';
+import { UpdateBusinessesUserCommand } from './commands/update-businesses-user.command';
 
 
 @Injectable()
@@ -88,9 +90,15 @@ export class UsersService {
     )
   }
 
-  async businessesUserServiceHandler(userBusinessesDto: UserBusinessesDto, request: Request): Promise<IBusinessUser> {
+  async addBusinessesUserServiceHandler(addUserBusinessesDto: AddUserBusinessesDto, request: Request): Promise<IAddBusinessUser> {
     return await this.commandBus.execute(
-      new BusinessesUserCommand(userBusinessesDto, request)
+      new AddBusinessesUserCommand(addUserBusinessesDto, request)
+    )
+  }
+
+  async updateBusinessesUserServiceHandler(updateUserBusinessesDto: UpdateUserBusinessesDto, request: Request): Promise<IUpdateBusinessUser> {
+    return await this.commandBus.execute(
+      new UpdateBusinessesUserCommand(updateUserBusinessesDto, request)
     )
   }
 
@@ -102,7 +110,7 @@ export class UsersService {
     )
   }
 
- 
+
 
 
 }

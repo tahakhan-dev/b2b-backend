@@ -66,14 +66,37 @@ export interface IGetProfileUser {
 }
 
 
-export interface IBusinessUser {
+export interface IAddBusinessUser {
     StatusCode?: StatusCodes,
     Status: Status
-    Result?: Partial<BusinessUserResult[]>
+    Result?: Partial<AddBusinessUserResult[]>
     Message?: string
 }
 
-export interface BusinessUserResult{
+export interface IUpdateBusinessUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<UpdateBusinessUserResult[]>
+    Message?: string
+}
+
+export interface AddBusinessUserResult{
+    id: number,
+    userId:number,
+    businessContactInfromation:string,
+    businessDescription:string,
+    businessLocations:string,
+    headquarters:string,
+    businessEmail:string,
+    businessPhoneNumber:string,
+    sysId:string
+    isActive: boolean,
+    isDeleted: boolean,
+    serverCreatedOn: Date,
+    serverUpdatedOn: Date
+}
+
+export interface UpdateBusinessUserResult{
     id: number,
     userId:number,
     businessContactInfromation:string,

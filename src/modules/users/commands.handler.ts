@@ -1,5 +1,5 @@
 import { CommandHandler, EventPublisher, ICommandHandler } from "@nestjs/cqrs";
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser,IBusinessUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IAddBusinessUser, IUpdateBusinessUser } from "./interface/res/user.interface";
 import { CreateUserCommand } from "./commands/create-user.command";
 import { LoginUserCommand } from "./commands/login-user.command";
 import { UserRepository } from "./users.repository";
@@ -10,7 +10,8 @@ import { VerificationCodeUserCommand } from "./commands/verification-code-user.c
 import { ResendForgetPasswordLinkCommand } from "./commands/resend-forgetpassword-link-user.command";
 import { ChangingPasswordUserCommand } from "./commands/changing-password-user.command";
 import { UpdateProfileUserCommand } from "./commands/update-profile-user.command";
-import { BusinessesUserCommand } from "./commands/businesses-user.command";
+import { AddBusinessesUserCommand } from "./commands/add-businesses-user.command";
+import { UpdateBusinessesUserCommand } from "./commands/update-businesses-user.command";
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserCommandHandler implements ICommandHandler<CreateUserCommand> {
@@ -161,19 +162,40 @@ export class UpdateProfileUserCommandHandler implements ICommandHandler<UpdatePr
     }
 }
 
-@CommandHandler(BusinessesUserCommand)
-export class BusinessesUserCommandHandler implements ICommandHandler<BusinessesUserCommand> {
+@CommandHandler(AddBusinessesUserCommand)
+export class BusinessesUserCommandHandler implements ICommandHandler<AddBusinessesUserCommand> {
     constructor(
         private readonly userRepo: UserRepository,
         private readonly publisher: EventPublisher,
     ) { }
 
     // @ts-ignore
-    async execute(command: BusinessesUserCommand, resolve: (value?) => void): Promise<IBusinessUser> {
-        const updateProfile = this.publisher.mergeObjectContext(
-            await this.userRepo.businessesUser(command.userBusinessesDto, command.request),
+    async execute(command: AddBusinessesUserCommand, resolve: (value?) => void): Promise<IAddBusinessUser> {
+        const addUserBusiness = this.publisher.mergeObjectContext(
+            await this.userRepo.addBusinessesUser(command.addUserBusinessesDto, command.request),
         );
-        return updateProfile;
+        return addUserBusiness;
     }
+
+
+}
+
+
+@CommandHandler(UpdateBusinessesUserCommand)
+export class UpdateBusinessesUserCommandHandler implements ICommandHandler<UpdateBusinessesUserCommand> {
+    constructor(
+        private readonly userRepo: UserRepository,
+        private readonly publisher: EventPublisher,
+    ) { }
+
+    // @ts-ignore
+    async execute(command: UpdateBusinessesUserCommand, resolve: (value?) => void): Promise<IUpdateBusinessUser> {
+        const updateUserBusiness = this.publisher.mergeObjectContext(
+            await this.userRepo.updateBusinessesUser(command.updateUserBusinessesDto, command.request),
+        );
+        return updateUserBusiness;
+    }
+
+
 }
 
