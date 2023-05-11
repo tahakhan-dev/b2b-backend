@@ -80,32 +80,39 @@ export interface IUpdateBusinessUser {
     Message?: string
 }
 
-export interface AddBusinessUserResult{
+export interface IDeleteBusinessUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: any
+    Message?: string
+}
+
+export interface AddBusinessUserResult {
     id: number,
-    userId:number,
-    businessContactInfromation:string,
-    businessDescription:string,
-    businessLocations:string,
-    headquarters:string,
-    businessEmail:string,
-    businessPhoneNumber:string,
-    sysId:string
+    userId: number,
+    businessContactInfromation: string,
+    businessDescription: string,
+    businessLocations: string,
+    headquarters: string,
+    businessEmail: string,
+    businessPhoneNumber: string,
+    sysId: string
     isActive: boolean,
     isDeleted: boolean,
     serverCreatedOn: Date,
     serverUpdatedOn: Date
 }
 
-export interface UpdateBusinessUserResult{
+export interface UpdateBusinessUserResult {
     id: number,
-    userId:number,
-    businessContactInfromation:string,
-    businessDescription:string,
-    businessLocations:string,
-    headquarters:string,
-    businessEmail:string,
-    businessPhoneNumber:string,
-    sysId:string
+    userId: number,
+    businessContactInfromation: string,
+    businessDescription: string,
+    businessLocations: string,
+    headquarters: string,
+    businessEmail: string,
+    businessPhoneNumber: string,
+    sysId: string
     isActive: boolean,
     isDeleted: boolean,
     serverCreatedOn: Date,

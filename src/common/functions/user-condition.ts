@@ -1,4 +1,4 @@
-import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from 'src/interface/conditions/users-condition.interface';
+import { IDeleteConditon, IUpdateByIdAndUserId, IUpdateByUserIdAndIsActive, IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from 'src/interface/conditions/users-condition.interface';
 import { Injectable } from '@nestjs/common';
 import { UserRole } from '../enums/user-role';
 
@@ -21,5 +21,19 @@ export class UserConditions {
             },
         }
     }
+
+    updateByIdAndUserId(id: number, userId: number): IUpdateByIdAndUserId {
+        return { id, userId }
+    }
+
+    deleteCondition(): IDeleteConditon {
+        return { isActive: false, isDeleted: true }
+    }
+
+    updateByUserIdAndIsActive(id: number, isActive): IUpdateByUserIdAndIsActive {
+        return { id, isActive }
+    }
+
+
 
 }
