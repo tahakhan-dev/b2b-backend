@@ -1,4 +1,4 @@
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IBusinessUser } from "./interface/res/user.interface";
 import { IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
@@ -31,6 +31,8 @@ import { LessThan, Repository } from "typeorm";
 import { Request } from 'express';
 import * as moment from 'moment';
 import 'dotenv/config';
+import { UserBusinessesDto } from "./dto/user-businesses.dto";
+import { UserBusinessesEntity } from "./entities/user-businesses.entity";
 
 
 @Injectable()
@@ -48,13 +50,19 @@ export class UserRepository {
         private readonly UserForgetPasswordRepositoryW: Repository<UserForgetPasswordCodeEntity>,
         @InjectRepository(UserForgetPasswordCodeEntity, process.env.CONNECTION_NAME_2)
         private readonly UserForgetPasswordRepositoryR: Repository<UserForgetPasswordCodeEntity>,
+        @InjectRepository(UserBusinessesEntity)
+        private readonly UserBusinessesRepositoryW: Repository<UserBusinessesEntity>,
+        @InjectRepository(UserBusinessesEntity, process.env.CONNECTION_NAME_2)
+        private readonly UserBusinessesRepositoryR: Repository<UserBusinessesEntity>,
+
+
         @Inject(UserMapper) private readonly mapper: UserMapper,
         @Inject(AuthService) private readonly authService: AuthService,
         @Inject(GenerateDigits) private readonly randomDigit: GenerateDigits,
         @Inject(UserConditions) private readonly userCondition: UserConditions,
         @Inject(SendEmail) private readonly sendEmailService: SendEmail,
         @Inject(UserValidation) private readonly userValidationService: UserValidation,
-        @Inject(DecryptToken) private readonly decryptTokenService: DecryptToken
+        @Inject(DecryptToken) private readonly decryptTokenService: DecryptToken,
 
     ) { }
 
@@ -93,6 +101,10 @@ export class UserRepository {
 
     async updateProfile(updateUserProfileUserDto: UpdateUserProfileUserDto, request: Request): Promise<any> {
         return await this.updateProfileUser(updateUserProfileUserDto, request);
+    }
+
+    async businessesUser(userBusinessesDto: UserBusinessesDto, request: Request): Promise<any> {
+        return await this.businessProfileUser(userBusinessesDto, request);
     }
 
     // -------------------- get calls-----------------------------
@@ -216,7 +228,6 @@ export class UserRepository {
         }
         return response;
     }
-
 
     private async checkingForgetPasswordUserCode(forgetPasswordCodeUserDto: ForgetPasswordCodeUserDto): Promise<IForgetPasswordCodeUser> {
         let response: IForgetPasswordCodeUser, validationError: IForgetPasswordCodeUser, getuser: Partial<UserEntity>,
@@ -378,7 +389,6 @@ export class UserRepository {
 
     }
 
-
     private async signIn(loginUserDto: LoginUserDto): Promise<ILoginUser> {
         let response: ILoginUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUser: UserEntity,
             validationError: ILoginUser, checkingUserPassword: boolean, usertoken: string;
@@ -417,6 +427,24 @@ export class UserRepository {
             decryptResponse = this.decryptTokenService.decryptUserToken(request);
             await this.userRepositoryW.update({ id: decryptResponse.userId }, updateUserProfileUserDto)
             response = responseHandler(null, "Your Profile Is Updated ", Status.SUCCESS, StatusCodes.SUCCESS);
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+        return response
+    }
+
+
+    private async businessProfileUser(userBusinessesDto: UserBusinessesDto, request: Request): Promise<IBusinessUser> {
+        let response: IBusinessUser, decryptResponse: IDecryptWrapper, userBusinessMapper: UserBusinessesEntity;
+        try {
+
+            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            userBusinessMapper = this.mapper.createUserBusinessObj(decryptResponse, userBusinessesDto);
+
+            await this.UserBusinessesRepositoryW.save(userBusinessMapper)
+
+            response = responseHandler(null, "User Business Added", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
             response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)

@@ -1,4 +1,4 @@
-import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IBusinessUser } from './interface/res/user.interface';
 import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
 import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
@@ -22,6 +22,8 @@ import { UpdateProfileUserCommand } from './commands/update-profile-user.command
 import { Request } from 'express';
 import 'dotenv/config';
 import { GetProfileUserQuery } from './query/get-profile-user.query';
+import { UserBusinessesDto } from './dto/user-businesses.dto';
+import { BusinessesUserCommand } from './commands/businesses-user.command';
 
 
 @Injectable()
@@ -83,6 +85,12 @@ export class UsersService {
   async updateProfileUserServiceHandler(updateUserProfileUserDto: UpdateUserProfileUserDto, request: Request): Promise<IUpdateProfileUser> {
     return await this.commandBus.execute(
       new UpdateProfileUserCommand(updateUserProfileUserDto, request)
+    )
+  }
+
+  async businessesUserServiceHandler(userBusinessesDto: UserBusinessesDto, request: Request): Promise<IBusinessUser> {
+    return await this.commandBus.execute(
+      new BusinessesUserCommand(userBusinessesDto, request)
     )
   }
 
