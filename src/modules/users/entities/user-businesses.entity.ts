@@ -1,5 +1,5 @@
-import { BaseEntity } from "src/entitiesList/base.entity";
 import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity";
+import { BaseEntity } from "src/entitiesList/base.entity";
 import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
 
 @Entity({ name: 'user_businesses' })

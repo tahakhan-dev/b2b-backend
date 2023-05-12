@@ -1,6 +1,6 @@
+import { DeleteUserBusinessesDto } from '../dto/delete-businesses-user.dto';
 import { ICommand } from '@nestjs/cqrs';
 import { Request } from 'express';
-import { DeleteUserBusinessesDto } from '../dto/delete-businesses-user.dto';
 
 
 export class DeleteBusinessesUserCommand implements ICommand {

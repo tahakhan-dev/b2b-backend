@@ -67,7 +67,7 @@ export class UserMapper {
 
     UpdateUserBusinessObj(updateUserBusinessesDto: UpdateUserBusinessesDto): UserBusinessesEntity {
         const updateUserBusinessObj = new UserBusinessesEntity();
-        // updateUserBusinessObj.businessType = new BusinessTypeCategoryEntity();
+        updateUserBusinessObj.businessType = new BusinessTypeCategoryEntity();
         updateUserBusinessObj.businessType.id = updateUserBusinessesDto?.businessTypeId;
         updateUserBusinessObj.businessName = updateUserBusinessesDto?.businessName ?? null
         updateUserBusinessObj.businessContactInfromation = updateUserBusinessesDto?.businessContactInfromation ?? null;

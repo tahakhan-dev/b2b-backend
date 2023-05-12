@@ -7,7 +7,6 @@ export class UserConditions {
 
     usernameOrEmail(email?: string, userName?: string, role?: UserRole): IUserSearchOptionsByUserNameOrEmail { // username and email function condition asigning interface to it
 
-
         let condition: IUserSearchOptionsByUserNameOrEmail = email && userName ? {
             where: [{ email, role, isActive: true },
             { userName, role, isActive: true }]

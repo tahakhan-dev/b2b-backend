@@ -1,6 +1,6 @@
+import { UpdateUserBusinessesDto } from '../dto/update-businesses-user.dto';
 import { ICommand } from '@nestjs/cqrs';
 import { Request } from 'express';
-import { UpdateUserBusinessesDto } from '../dto/update-businesses-user.dto';
 
 
 export class UpdateBusinessesUserCommand implements ICommand {

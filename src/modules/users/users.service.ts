@@ -3,20 +3,25 @@ import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpasswor
 import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
 import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
-import { AddBusinessesUserCommand } from './commands/add-businesses-user.command';
-import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
-import { CreateUserCommand } from './commands/create-user.command';
-import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
-import { ResetPasswordUserCommand } from './commands/reset-password-user.command';
-import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
+import { UpdateBusinessesUserCommand } from './commands/update-businesses-user.command';
+import { DeleteBusinessesUserCommand } from './commands/delete-businesses-user.command';
 import { VerificationCodeUserCommand } from './commands/verification-code-user.command';
-import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
-import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
 import { ChangingPasswordUserCommand } from './commands/changing-password-user.command';
-import { UpdateUserProfileUserDto } from './dto/update-profile-user.dto';
+import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
+import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
+import { AddBusinessesUserCommand } from './commands/add-businesses-user.command';
+import { ResetPasswordUserCommand } from './commands/reset-password-user.command';
 import { UpdateProfileUserCommand } from './commands/update-profile-user.command';
+import { VerificationLinkUserDto } from './dto/verification-link-user.dto';
+import { ChangingPasswordUserDto } from './dto/changing-password-user.dto';
+import { UpdateUserBusinessesDto } from './dto/update-businesses-user.dto';
+import { DeleteUserBusinessesDto } from './dto/delete-businesses-user.dto';
+import { GetBusinessesUserQuery } from './query/get-businesses-user.query';
+import { UpdateUserProfileUserDto } from './dto/update-profile-user.dto';
+import { ResetPasswordUserDto } from './dto/reset-password-user.dto';
 import { GetProfileUserQuery } from './query/get-profile-user.query';
 import { AddUserBusinessesDto } from './dto/add-user-businesses.dto';
+import { CreateUserCommand } from './commands/create-user.command';
 import { LoginUserCommand } from './commands/login-user.command';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -24,11 +29,6 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import 'dotenv/config';
-import { UpdateUserBusinessesDto } from './dto/update-businesses-user.dto';
-import { UpdateBusinessesUserCommand } from './commands/update-businesses-user.command';
-import { DeleteBusinessesUserCommand } from './commands/delete-businesses-user.command';
-import { DeleteUserBusinessesDto } from './dto/delete-businesses-user.dto';
-import { GetBusinessesUserQuery } from './query/get-businesses-user.query';
 
 
 @Injectable()

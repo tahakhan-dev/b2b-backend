@@ -1,9 +1,8 @@
+import { IGetBusinessesUser, IGetProfileUser } from "./interface/res/user.interface";
 import { EventPublisher, IQueryHandler, QueryHandler } from "@nestjs/cqrs";
+import { GetBusinessesUserQuery } from "./query/get-businesses-user.query";
 import { GetProfileUserQuery } from "./query/get-profile-user.query";
 import { UserRepository } from "./users.repository";
-
-import { IGetBusinessesUser, IGetProfileUser } from "./interface/res/user.interface";
-import { GetBusinessesUserQuery } from "./query/get-businesses-user.query";
 
 
 @QueryHandler(GetProfileUserQuery)

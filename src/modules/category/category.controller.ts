@@ -6,7 +6,7 @@ import { hasRoles } from '../auth/guards/decorators/roles.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-guard';
 import { UserRole } from 'src/common/enums/user-role';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { IBusinessTypeCategory } from './interface/category.interface';
+import { IBusinessTypeCategory, ICreateCategory, IUpdateCategory } from './interface/category.interface';
 import { Response, Request } from 'express';
 import { IResponseWrapper } from 'src/interface/base.response.interface';
 import { StatusCodes } from 'src/common/enums/status-codes';
@@ -35,6 +35,51 @@ export class CategoryController {
     }
   }
 
+  // ----------------------- Post Request ---------------------------------------------
 
+
+  @hasRoles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('add_business_category')
+  async addBusinessCategory(@Res() res: Response, @Body() createCategoryDto: CreateCategoryDto): Promise<ICreateCategory> {
+
+    try {
+
+      const createdBusinessCategory = await this.categoryService.createBussinessServiceHandler(createCategoryDto);
+      res.status(Number(createdBusinessCategory.StatusCode)).json(createdBusinessCategory)
+
+    } catch (error) {
+
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @hasRoles(UserRole.ADMIN)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('update_business_category')
+  async updateBusinessCategory(@Res() res: Response, @Body() updateCategoryDto: UpdateCategoryDto): Promise<IUpdateCategory> {
+
+    try {
+
+      const updateBusinessCategory = await this.categoryService.updateBussinessServiceHandler(updateCategoryDto);
+      res.status(Number(updateBusinessCategory.StatusCode)).json(updateBusinessCategory)
+
+    } catch (error) {
+
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
 
 }
