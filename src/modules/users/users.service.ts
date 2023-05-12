@@ -1,4 +1,4 @@
-import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser, IDeleteBusinessUser } from './interface/res/user.interface';
+import { ICreateUser, ILoginUser, IVerificationLinkUser, IForgetPasswordCodeUser, IResetPasswordUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser, IDeleteBusinessUser, IGetBusinessesUser } from './interface/res/user.interface';
 import { ResendForgetPasswordLinkCommand } from './commands/resend-forgetpassword-link-user.command';
 import { ForgetPasswordCodeUserCommand } from './commands/forget-password-code-user.command';
 import { VerificationLinkUserCommand } from './commands/verification-link-user.command';
@@ -28,6 +28,7 @@ import { UpdateUserBusinessesDto } from './dto/update-businesses-user.dto';
 import { UpdateBusinessesUserCommand } from './commands/update-businesses-user.command';
 import { DeleteBusinessesUserCommand } from './commands/delete-businesses-user.command';
 import { DeleteUserBusinessesDto } from './dto/delete-businesses-user.dto';
+import { GetBusinessesUserQuery } from './query/get-businesses-user.query';
 
 
 @Injectable()
@@ -115,6 +116,12 @@ export class UsersService {
   async getProfileUserServiceHandler(request: Request): Promise<IGetProfileUser> {
     return await this.queryBus.execute(
       new GetProfileUserQuery(request)
+    )
+  }
+
+  async getUserBusinessesServiceHandler(request: Request): Promise<IGetBusinessesUser> {
+    return await this.queryBus.execute(
+      new GetBusinessesUserQuery(request)
     )
   }
 

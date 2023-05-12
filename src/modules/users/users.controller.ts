@@ -1,4 +1,4 @@
-import { IAddBusinessUser, IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, IGetProfileUser, ILoginUser, IResetPasswordUser, IUpdateBusinessUser, IUpdateProfileUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { IAddBusinessUser, IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, IGetBusinessesUser, IGetProfileUser, ILoginUser, IResetPasswordUser, IUpdateBusinessUser, IUpdateProfileUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
 import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
 import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
@@ -258,6 +258,25 @@ export class UsersController {
     try {
       const getUserProfile = await this.usersService.getProfileUserServiceHandler(request);
       res.status(Number(getUserProfile.StatusCode)).json(getUserProfile)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('get_user_businesses') // chaning password with in the application
+  async getUserBusinesses(@Res() res: Response, @Req() request: Request): Promise<IGetBusinessesUser> {
+
+    try {
+      const getUserBusinesses = await this.usersService.getUserBusinessesServiceHandler(request);
+      res.status(Number(getUserBusinesses.StatusCode)).json(getUserBusinesses)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,

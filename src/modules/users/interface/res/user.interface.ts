@@ -1,6 +1,7 @@
 import { StatusCodes } from "src/common/enums/status-codes"
 import { UserEntity } from "../../entities/user.entity"
 import { Status } from "src/common/enums/status"
+import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity"
 
 export interface ICreateUser {
     StatusCode?: StatusCodes,
@@ -65,6 +66,13 @@ export interface IGetProfileUser {
     Message?: string
 }
 
+export interface IGetBusinessesUser {
+    StatusCode?: StatusCodes,
+    Status: Status
+    Result?: Partial<GetBusinessUserResult[]>
+    Message?: string
+}
+
 
 export interface IAddBusinessUser {
     StatusCode?: StatusCodes,
@@ -93,10 +101,28 @@ export interface AddBusinessUserResult {
     businessContactInfromation: string,
     businessDescription: string,
     businessLocations: string,
+    businessName: string,
     headquarters: string,
     businessEmail: string,
     businessPhoneNumber: string,
     sysId: string
+    isActive: boolean,
+    isDeleted: boolean,
+    serverCreatedOn: Date,
+    serverUpdatedOn: Date
+}
+
+export interface GetBusinessUserResult {
+    id: number,
+    userId: number,
+    businessName: string;
+    businessContactInfromation: string,
+    businessDescription: string,
+    businessLocations: string,
+    businessType: BusinessTypeCategoryEntity
+    headquarters: string,
+    businessEmail: string,
+    businessPhoneNumber: string,
     isActive: boolean,
     isDeleted: boolean,
     serverCreatedOn: Date,
