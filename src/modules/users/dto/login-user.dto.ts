@@ -1,7 +1,7 @@
-import { Transform } from "class-transformer";
-import { IsEnum, IsNotEmpty, IsString, IsOptional, IsBoolean, IsEmail } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString, IsOptional, IsEmail } from "class-validator";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { UserRole } from "src/common/enums/user-role";
+import { Transform } from "class-transformer";
 
 export class LoginUserDto {
 

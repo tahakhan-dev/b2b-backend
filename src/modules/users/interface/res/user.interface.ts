@@ -1,7 +1,7 @@
+import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity"
 import { StatusCodes } from "src/common/enums/status-codes"
 import { UserEntity } from "../../entities/user.entity"
 import { Status } from "src/common/enums/status"
-import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity"
 
 export interface ICreateUser {
     StatusCode?: StatusCodes,

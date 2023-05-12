@@ -1,6 +1,4 @@
 import { Column, PrimaryGeneratedColumn, BeforeUpdate } from 'typeorm';
-import * as moment from 'moment';
-
 
 export class BaseEntity {
 

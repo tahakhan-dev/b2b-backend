@@ -1,7 +1,7 @@
-import { Transform } from "class-transformer";
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { UserRole } from "src/common/enums/user-role";
+import { Transform } from "class-transformer";
 
 export class ResendForgetPasswordLinkUserDto {
 
