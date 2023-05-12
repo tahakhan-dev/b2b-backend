@@ -15,7 +15,7 @@ import { UsersService } from './users.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
 import { DecryptToken } from 'src/common/functions/decrypt-token';
-import { GetProfileUserQueryHandler } from './query.handler';
+import { GetBusinessesUserQueryHandler, GetProfileUserQueryHandler } from './query.handler';
 import { UserBusinessesEntity } from './entities/user-businesses.entity';
 import 'dotenv/config';
 
@@ -51,7 +51,8 @@ import 'dotenv/config';
     UpdateBusinessesUserCommandHandler,
     DeleteBusinessesUserCommandHandler,
     //------ Query Handler
-    GetProfileUserQueryHandler
+    GetProfileUserQueryHandler,
+    GetBusinessesUserQueryHandler
   ],
   exports: [UserRepository]
 })

@@ -1,4 +1,5 @@
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsEmail, IsEnum, IsNotEmpty, IsString } from "class-validator";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { UserRole } from "src/common/enums/user-role";
 
@@ -6,6 +7,8 @@ export class VerificationLinkUserDto {
 
     @IsNotEmpty()
     @IsString()
+    @IsEmail()
+    @Transform(({ value }) => value.toLowerCase().toString().replace(/\s/g, ''))
     email: string;
 
 

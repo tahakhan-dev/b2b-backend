@@ -10,6 +10,7 @@ import { AddUserBusinessesDto } from "../dto/add-user-businesses.dto";
 import { UserBusinessesEntity } from "../entities/user-businesses.entity";
 import * as moment from 'moment';
 import { UpdateUserBusinessesDto } from "../dto/update-businesses-user.dto";
+import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity";
 
 
 @Injectable()
@@ -47,8 +48,9 @@ export class UserMapper {
 
     createUserBusinessObj(decryptResponse: IDecryptWrapper, addUserBusinessesDto: AddUserBusinessesDto): UserBusinessesEntity {
         const addUserBusinessObj = new UserBusinessesEntity();
+        addUserBusinessObj.businessType = new BusinessTypeCategoryEntity();
         addUserBusinessObj.userId = decryptResponse?.userId;
-        addUserBusinessObj.businessTypeId = addUserBusinessesDto?.businessTypeId;
+        addUserBusinessObj.businessType.id = addUserBusinessesDto?.businessTypeId;
         addUserBusinessObj.businessContactInfromation = addUserBusinessesDto?.businessContactInfromation ?? null;
         addUserBusinessObj.businessLocations = addUserBusinessesDto?.businessLocations ?? null
         addUserBusinessObj.businessPhoneNumber = addUserBusinessesDto?.businessPhoneNumber ?? null
@@ -65,7 +67,8 @@ export class UserMapper {
 
     UpdateUserBusinessObj(updateUserBusinessesDto: UpdateUserBusinessesDto): UserBusinessesEntity {
         const updateUserBusinessObj = new UserBusinessesEntity();
-        updateUserBusinessObj.businessTypeId = updateUserBusinessesDto?.businessTypeId;
+        // updateUserBusinessObj.businessType = new BusinessTypeCategoryEntity();
+        updateUserBusinessObj.businessType.id = updateUserBusinessesDto?.businessTypeId;
         updateUserBusinessObj.businessName = updateUserBusinessesDto?.businessName ?? null
         updateUserBusinessObj.businessContactInfromation = updateUserBusinessesDto?.businessContactInfromation ?? null;
         updateUserBusinessObj.businessDescription = updateUserBusinessesDto?.businessDescription ?? null;

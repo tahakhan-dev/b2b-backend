@@ -34,7 +34,7 @@ export interface IUpdateByIdAndUserId {
 }
 
 export interface IUpdateByUserIdAndIsActive {
-    id: number, isActive: boolean
+    userId: number, isActive: boolean
 }
 
 export interface IDeleteConditon {

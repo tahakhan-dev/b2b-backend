@@ -1,4 +1,4 @@
-import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser, IDeleteBusinessUser } from "./interface/res/user.interface";
+import { IResetPasswordUser, ICreateUser, IForgetPasswordCodeUser, ILoginUser, IVerificationLinkUser, IVerificationCodeUser, IChangingPasswordUser, IUpdateProfileUser, IGetProfileUser, IAddBusinessUser, IUpdateBusinessUser, IDeleteBusinessUser, IGetBusinessesUser, GetBusinessUserResult } from "./interface/res/user.interface";
 import { IDeleteConditon, IUpdateByIdAndUserId, IUpdateByUserIdAndIsActive, IUserCodeByUserId, IUserSearchOptionsByUserNameOrEmail } from "src/interface/conditions/users-condition.interface";
 import { UserForgetPasswordCodeEntity } from "./entities/user-forgetpassword-verfication.entity";
 import { ForgetPasswordCodeUserDto } from "./dto/checking-forgetpassword-code-user.dto";
@@ -120,6 +120,10 @@ export class UserRepository {
     // -------------------- get calls-----------------------------
     async getUpdateProfile(request: Request): Promise<any> {
         return await this.getUserUpdateProfile(request)
+    }
+
+    async getUserBusinesses(request: Request): Promise<any> {
+        return await this.getBusinessesUser(request)
     }
 
 
@@ -279,7 +283,7 @@ export class UserRepository {
             } else {
                 // storedDate is still valid
                 await this.UserForgetPasswordRepositoryW.update(updateUserCondition, deleteConditon)
-                response = responseHandler(null, "Your User has Been Verified ", Status.SUCCESS, StatusCodes.SUCCESS)
+                response = responseHandler(null, "Valid Code", Status.SUCCESS, StatusCodes.SUCCESS)
             }
             return response
 
@@ -341,7 +345,7 @@ export class UserRepository {
 
     private async resetUserPassword(resetPasswordUserDto: ResetPasswordUserDto): Promise<IResetPasswordUser> {
         let response: IResetPasswordUser, validationError: IResetPasswordUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail,
-            getuser: Partial<UserEntity>, hashResetPassword: string, updateUserCondition: IUpdateByUserIdAndIsActive;
+            getuser: Partial<UserEntity>, hashResetPassword: string, isOldPassword: boolean;
         try {
 
             validationError = this.userValidationService.userResetPasswordValidation(resetPasswordUserDto, undefined, false);
@@ -355,8 +359,10 @@ export class UserRepository {
 
             if (validationError) return validationError
 
+            isOldPassword = await this.authService.comparePasswords(resetPasswordUserDto.password, getuser.password)
+            if (isOldPassword) return responseHandler(null, "This Is Your Old Password Try New One ", Status.FAILED, StatusCodes.CONFLICT)
+
             hashResetPassword = await this.authService.hashPassword(resetPasswordUserDto.password);
-            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getuser.id, true);
 
             await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { password: hashResetPassword });
 
@@ -372,7 +378,7 @@ export class UserRepository {
 
     private async changingUserPassword(changingPasswordUserDto: ChangingPasswordUserDto): Promise<IChangingPasswordUser> {
         let response: IChangingPasswordUser, validationError: IChangingPasswordUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getuser: Partial<UserEntity>,
-            isOldPassword: boolean, hashPassword: string, updateUserCondition: IUpdateByUserIdAndIsActive;
+            isOldPassword: boolean, hashPassword: string;
         try {
 
             validationError = this.userValidationService.userResetPasswordValidation(changingPasswordUserDto, undefined, false);
@@ -393,8 +399,6 @@ export class UserRepository {
             if (isOldPassword) return responseHandler(null, "This is your old password enter new password ", Status.SUCCESS, StatusCodes.BAD_REQUEST);
 
             hashPassword = await this.authService.hashPassword(changingPasswordUserDto.newPassword);
-            updateUserCondition = this.userCondition.updateByUserIdAndIsActive(getuser.id, true);
-
             await this.userRepositoryW.update({ id: getuser.id, isActive: true }, { password: hashPassword });
 
             response = responseHandler(null, "Your Password Is Changed ", Status.SUCCESS, StatusCodes.SUCCESS)
@@ -413,12 +417,14 @@ export class UserRepository {
         try {
 
             getUserWhereClause = this.userCondition.usernameOrEmail(loginUserDto.email, loginUserDto.userName, loginUserDto.role as UserRole);
+
             getUser = await this.userRepositoryR.findOne(getUserWhereClause);
 
             validationError = this.userValidationService.loginUserValidation(getUser, loginUserDto);
             if (validationError) return validationError
 
             checkingUserPassword = await this.authService.comparePasswords(loginUserDto.password, getUser.password);
+            if (!checkingUserPassword) return responseHandler(null, "Invalid User Name Or Password", Status.SUCCESS, StatusCodes.SUCCESS);
             usertoken = await this.authService.generateJWT(getUser);
             getUser.token = usertoken
 
@@ -522,6 +528,25 @@ export class UserRepository {
         }
         return response
     }
+
+
+    private async getBusinessesUser(request: Request): Promise<IGetBusinessesUser> {
+        let response: IGetBusinessesUser, decryptResponse: IDecryptWrapper, result: Partial<GetBusinessUserResult[]>;
+        try {
+            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            result = await this.UserBusinessesRepositoryR.find({
+                where: { userId: decryptResponse.userId },
+                relations: ['businessType']
+            });
+            response = responseHandler(result, "Your Businesses ", Status.SUCCESS, StatusCodes.SUCCESS);
+
+        } catch (error) {
+            response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
+        }
+        return response
+
+    }
+
 
 
 

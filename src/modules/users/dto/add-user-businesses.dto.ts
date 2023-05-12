@@ -1,4 +1,5 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 
 export class AddUserBusinessesDto {
@@ -30,6 +31,8 @@ export class AddUserBusinessesDto {
 
     @IsOptional()
     @IsString()
+    @IsEmail()
+    @Transform(({ value }) => value.toLowerCase().toString().replace(/\s/g, ''))
     businessEmail: string
 
     @IsOptional()

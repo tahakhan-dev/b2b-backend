@@ -55,7 +55,10 @@ export class UserValidation {
 
         if (!getUser && exists == true) return responseHandler(null, "No User Exist ", Status.SUCCESS, StatusCodes.NOT_FOUND)
 
-        if (getUser && getUser?.emailVerified === true) return responseHandler(null, "You Email is already verified ", Status.SUCCESS, StatusCodes.SUCCESS)
+        console.log(getUser,'=========getUser=========',exists,'======exists=========');
+        
+
+        // if (getUser && getUser?.emailVerified === true) return responseHandler(null, "You Email is already verified ", Status.SUCCESS, StatusCodes.SUCCESS)
 
 
 
