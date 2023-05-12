@@ -1,4 +1,4 @@
-import { IBusinessUser, IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, IGetProfileUser, ILoginUser, IResetPasswordUser, IUpdateProfileUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
+import { IAddBusinessUser, IChangingPasswordUser, ICreateUser, IForgetPasswordCodeUser, IGetBusinessesUser, IGetProfileUser, ILoginUser, IResetPasswordUser, IUpdateBusinessUser, IUpdateProfileUser, IVerificationCodeUser, IVerificationLinkUser } from './interface/res/user.interface';
 import { ForgetPasswordCodeUserDto } from './dto/checking-forgetpassword-code-user.dto';
 import { ResendForgetPasswordLinkUserDto } from './dto/forget-password-link-user.dto';
 import { VerificationCodeUserDto } from './dto/checking-verification-code-user.dto';
@@ -17,7 +17,9 @@ import { Status } from 'src/common/enums/status';
 import { UsersService } from './users.service';
 import { Response, Request } from 'express';
 import { UpdateUserProfileUserDto } from './dto/update-profile-user.dto';
-import { UserBusinessesDto } from './dto/user-businesses.dto';
+import { AddUserBusinessesDto } from './dto/add-user-businesses.dto';
+import { UpdateUserBusinessesDto } from './dto/update-businesses-user.dto';
+import { DeleteUserBusinessesDto } from './dto/delete-businesses-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -171,12 +173,12 @@ export class UsersController {
 
   @hasRoles(UserRole.BUYER, UserRole.SELLER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('update_user_profile') // chaning password with in the application
+  @Post('update_user_profile')
   async updateUserProfile(@Res() res: Response, @Req() request: Request, @Body() updateUserProfileUserDto: UpdateUserProfileUserDto): Promise<IUpdateProfileUser> {
 
     try {
-      const UpdateProfile = await this.usersService.updateProfileUserServiceHandler(updateUserProfileUserDto, request);
-      res.status(Number(UpdateProfile.StatusCode)).json(UpdateProfile)
+      const updateUserProfile = await this.usersService.updateProfileUserServiceHandler(updateUserProfileUserDto, request);
+      res.status(Number(updateUserProfile.StatusCode)).json(updateUserProfile)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -190,12 +192,50 @@ export class UsersController {
 
   @hasRoles(UserRole.BUYER, UserRole.SELLER)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Post('add_user_businesses') // chaning password with in the application
-  async userBusinesses(@Res() res: Response, @Req() request: Request, @Body() userBusinessesDto: UserBusinessesDto): Promise<IBusinessUser> {
+  @Post('add_user_businesses')
+  async addUserBusinesses(@Res() res: Response, @Req() request: Request, @Body() addUserBusinessesDto: AddUserBusinessesDto): Promise<IAddBusinessUser> {
 
     try {
-      const UpdateProfile = await this.usersService.businessesUserServiceHandler(userBusinessesDto, request);
-      res.status(Number(UpdateProfile.StatusCode)).json(UpdateProfile)
+      const addUserBusiness = await this.usersService.addBusinessesUserServiceHandler(addUserBusinessesDto, request);
+      res.status(Number(addUserBusiness.StatusCode)).json(addUserBusiness)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('update_user_businesses')
+  async updateUserBusinesses(@Res() res: Response, @Req() request: Request, @Body() updateUserBusinessesDto: UpdateUserBusinessesDto): Promise<IUpdateBusinessUser> {
+
+    try {
+      const updateUserBusiness = await this.usersService.updateBusinessesUserServiceHandler(updateUserBusinessesDto, request);
+      res.status(Number(updateUserBusiness.StatusCode)).json(updateUserBusiness)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post('delete_user_businesses')
+  async deleteUserBusinesses(@Res() res: Response, @Req() request: Request, @Body() deleteUserBusinessesDto: DeleteUserBusinessesDto): Promise<IUpdateBusinessUser> {
+
+    try {
+      const deleteUserBusiness = await this.usersService.deleteBusinessesUserServiceHandler(deleteUserBusinessesDto, request);
+      res.status(Number(deleteUserBusiness.StatusCode)).json(deleteUserBusiness)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -218,6 +258,25 @@ export class UsersController {
     try {
       const getUserProfile = await this.usersService.getProfileUserServiceHandler(request);
       res.status(Number(getUserProfile.StatusCode)).json(getUserProfile)
+    } catch (error) {
+      const response: IResponseWrapper<[]> = {
+        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        Status: Status.FAILED,
+        Result: null,
+        Message: 'There is some error',
+      };
+      return response;
+    }
+  }
+
+  @hasRoles(UserRole.BUYER, UserRole.SELLER)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('get_user_businesses') // chaning password with in the application
+  async getUserBusinesses(@Res() res: Response, @Req() request: Request): Promise<IGetBusinessesUser> {
+
+    try {
+      const getUserBusinesses = await this.usersService.getUserBusinessesServiceHandler(request);
+      res.status(Number(getUserBusinesses.StatusCode)).json(getUserBusinesses)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
         StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
