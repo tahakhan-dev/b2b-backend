@@ -1,5 +1,5 @@
-import { Transform } from "class-transformer";
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import { Transform } from "class-transformer";
 
 
 export class AddUserBusinessesDto {

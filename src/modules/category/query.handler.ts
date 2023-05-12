@@ -13,7 +13,7 @@ export class GetBusinessTypeCategoryQueryHandler implements IQueryHandler<GetBus
     ) { }
 
     // @ts-ignore
-    async execute(query: GetBusinessTypeCategoryQuery, resolve: (value?) => void): Promise<IBusinessTypeCategory> {
+    async execute(resolve: (value?) => void): Promise<IBusinessTypeCategory> {
         const getBusinessType = this.publisher.mergeObjectContext(
             await this.categoryRepo.businessTypeCategory(),
         );

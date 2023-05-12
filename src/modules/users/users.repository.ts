@@ -139,7 +139,6 @@ export class UserRepository {
         try {
 
             getUserWhereClause = this.userCondition.usernameOrEmail(createUserDto.email, createUserDto.userName, createUserDto.role as UserRole); // geting condition of username or email
-
             getUser = await this.userRepositoryR.findOne(getUserWhereClause); // finding user
 
             validationError = this.userValidationService.userExistsValidation(createUserDto, getUser); // validating user 

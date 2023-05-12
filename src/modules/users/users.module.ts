@@ -1,8 +1,11 @@
 import { BusinessesUserCommandHandler, ChangingPasswordUserCommandHandler, CreateUserCommandHandler, DeleteBusinessesUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, UpdateBusinessesUserCommandHandler, UpdateProfileUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserForgetPasswordCodeEntity } from './entities/user-forgetpassword-verfication.entity';
+import { GetBusinessesUserQueryHandler, GetProfileUserQueryHandler } from './query.handler';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
+import { UserBusinessesEntity } from './entities/user-businesses.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
 import { UserConditions } from 'src/common/functions/user-condition';
+import { DecryptToken } from 'src/common/functions/decrypt-token';
 import { UserValidation } from './functions/user-validation';
 import { SendEmail } from 'src/helpers/send-email.helper';
 import { UsersController } from './users.controller';
@@ -14,9 +17,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
-import { DecryptToken } from 'src/common/functions/decrypt-token';
-import { GetBusinessesUserQueryHandler, GetProfileUserQueryHandler } from './query.handler';
-import { UserBusinessesEntity } from './entities/user-businesses.entity';
 import 'dotenv/config';
 
 

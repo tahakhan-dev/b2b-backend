@@ -1,6 +1,6 @@
+import { BeforeInsert, BeforeUpdate, Column, Entity } from "typeorm";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { BaseEntity } from "src/entitiesList/base.entity";
-import { BeforeInsert, BeforeUpdate, Column, Entity } from "typeorm";
 import { UserRole } from "src/common/enums/user-role";
 
 @Entity({ name: 'users' })

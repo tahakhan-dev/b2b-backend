@@ -3,17 +3,17 @@ import { DatabaseModule } from './modules/databaseModule/database/database.modul
 import { CalculationProcessor } from './utils/workerThreads/calculation.processor';
 import { LoggingInterceptor } from './utils/interceptor/logging.interceptor';
 import { HttpExceptionFilter } from './utils/filters/http-exeception.filter';
+import { CategoryModule } from './modules/category/category.module';
 import { ConfigModule as EnvConfigModule } from '@nestjs/config';
 import { entitiesList } from './entitiesList/entities.list';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { UsersModule } from './modules/users/users.module';
+import { MailerModule } from '@nestjs-modules/mailer';
 import { ShutdownService } from './shutdown.service';
 import { AppController } from './app.controller';
 import { Module, Scope } from '@nestjs/common';
 import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bull';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { CategoryModule } from './modules/category/category.module';
 
 
 @Module({
