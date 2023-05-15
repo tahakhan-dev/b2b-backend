@@ -26,7 +26,7 @@ export class UserEntity extends BaseEntity {
     @Column({ name: 'signup_type', type: 'enum', enum: UserSignUpType, default: UserSignUpType.CUSTOM, nullable: false })
     signUpType: UserSignUpType;
 
-    @Column({ name: 'email_verified', default: false, nullable: true })
+    @Column({ name: 'email_verified', default: true, nullable: true })
     emailVerified: boolean;
 
     @Column({ name: 'opt_verification', default: true, nullable: true })
