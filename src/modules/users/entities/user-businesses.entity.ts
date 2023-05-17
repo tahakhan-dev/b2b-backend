@@ -11,6 +11,9 @@ export class UserBusinessesEntity extends BaseEntity {
     @JoinColumn({ name: 'business_type_id' })
     businessType: BusinessTypeCategoryEntity;
 
+    // @Column({ name: 'business_type_id', nullable: false })
+    // businessTypeId: number;
+
     @Column({ name: 'business_name', nullable: false })
     businessName: string;
 
