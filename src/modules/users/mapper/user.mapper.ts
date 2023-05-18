@@ -5,7 +5,12 @@ import { CreateUserDto } from "../dto/create-user.dto";
 import { UserRole } from "src/common/enums/user-role";
 import { UserEntity } from "../entities/user.entity";
 import { Injectable } from "@nestjs/common";
+import { IDecryptWrapper } from "src/interface/base.response.interface";
+import { AddUserBusinessesDto } from "../dto/add-user-businesses.dto";
+import { UserBusinessesEntity } from "../entities/user-businesses.entity";
 import * as moment from 'moment';
+import { UpdateUserBusinessesDto } from "../dto/update-businesses-user.dto";
+import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity";
 
 
 @Injectable()
@@ -22,8 +27,9 @@ export class UserMapper {
         userObj.signUpType = data.signUpType as UserSignUpType;
         userObj.phoneNumber = data.phoneNumber;
         userObj.profileImage = data.profileImage;
-        userObj.emailVerified = data && data.signUpType as UserSignUpType == UserSignUpType.CUSTOM &&
-            data.role as UserRole != UserRole.ADMIN ? false : true
+        // userObj.emailVerified = data && data.signUpType as UserSignUpType == UserSignUpType.CUSTOM &&
+        //     data.role as UserRole != UserRole.ADMIN ? false : true
+        userObj.emailVerified = true
 
         return userObj
 
@@ -39,5 +45,40 @@ export class UserMapper {
             verifObj.tokenCreationDate = formattedDate
 
         return verifObj
+    }
+
+    createUserBusinessObj(decryptResponse: IDecryptWrapper, addUserBusinessesDto: AddUserBusinessesDto): UserBusinessesEntity {
+        const addUserBusinessObj = new UserBusinessesEntity();
+        addUserBusinessObj.businessType = new BusinessTypeCategoryEntity();
+        addUserBusinessObj.userId = decryptResponse?.userId;
+        addUserBusinessObj.businessType.id = addUserBusinessesDto?.businessTypeId;
+        addUserBusinessObj.businessContactInfromation = addUserBusinessesDto?.businessContactInfromation ?? null;
+        addUserBusinessObj.businessLocations = addUserBusinessesDto?.businessLocations ?? null
+        addUserBusinessObj.businessPhoneNumber = addUserBusinessesDto?.businessPhoneNumber ?? null
+        addUserBusinessObj.businessDescription = addUserBusinessesDto?.businessDescription ?? null;
+        addUserBusinessObj.headquarters = addUserBusinessesDto?.headquarters ?? null;
+        addUserBusinessObj.businessEmail = addUserBusinessesDto?.businessEmail ?? null;
+        addUserBusinessObj.businessName = addUserBusinessesDto?.businessName ?? null
+        addUserBusinessObj.isActive = true
+        addUserBusinessObj.isDeleted = false
+        addUserBusinessObj.sysId = addUserBusinessesDto?.sysId ?? false
+
+        return addUserBusinessObj
+    }
+
+    UpdateUserBusinessObj(updateUserBusinessesDto: UpdateUserBusinessesDto): UserBusinessesEntity {
+        const updateUserBusinessObj = new UserBusinessesEntity();
+        updateUserBusinessObj.businessType = new BusinessTypeCategoryEntity();
+        updateUserBusinessObj.businessType.id = updateUserBusinessesDto?.businessTypeId;
+        updateUserBusinessObj.businessName = updateUserBusinessesDto?.businessName ?? null
+        updateUserBusinessObj.businessContactInfromation = updateUserBusinessesDto?.businessContactInfromation ?? null;
+        updateUserBusinessObj.businessDescription = updateUserBusinessesDto?.businessDescription ?? null;
+        updateUserBusinessObj.businessLocations = updateUserBusinessesDto?.businessLocations ?? null
+        updateUserBusinessObj.headquarters = updateUserBusinessesDto?.headquarters ?? null;
+        updateUserBusinessObj.businessEmail = updateUserBusinessesDto?.businessEmail ?? null;
+        updateUserBusinessObj.businessPhoneNumber = updateUserBusinessesDto?.businessPhoneNumber ?? null
+        updateUserBusinessObj.sysId = updateUserBusinessesDto?.sysId ?? false
+
+        return updateUserBusinessObj
     }
 }

@@ -1,8 +1,11 @@
-import { ChangingPasswordUserCommandHandler, CreateUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, UpdateProfileUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
+import { BusinessesUserCommandHandler, ChangingPasswordUserCommandHandler, CreateUserCommandHandler, DeleteBusinessesUserCommandHandler, ForgetPasswordCodeUserCommandHandler, LoginUserCommandHandler, ResendForgetPasswordLinkUserCommandHandler, ResetPasswordUserCommandHandler, UpdateBusinessesUserCommandHandler, UpdateProfileUserCommandHandler, VerificationCodeUserCommandHandler, VerificationLinkUserCommandHandler } from './commands.handler';
 import { UserForgetPasswordCodeEntity } from './entities/user-forgetpassword-verfication.entity';
+import { GetBusinessesUserQueryHandler, GetProfileUserQueryHandler } from './query.handler';
 import { UserVerificationCodeEntity } from './entities/user-verfication-code.entity';
+import { UserBusinessesEntity } from './entities/user-businesses.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
 import { UserConditions } from 'src/common/functions/user-condition';
+import { DecryptToken } from 'src/common/functions/decrypt-token';
 import { UserValidation } from './functions/user-validation';
 import { SendEmail } from 'src/helpers/send-email.helper';
 import { UsersController } from './users.controller';
@@ -14,16 +17,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
-import { DecryptToken } from 'src/common/functions/decrypt-token';
-import { GetProfileUserQueryHandler } from './query.handler';
 import 'dotenv/config';
+import { ArrayFilterHelper } from 'src/helpers/array-filter.helper';
 
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity]),
-    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity], process.env.CONNECTION_NAME_2),
+    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, UserBusinessesEntity]),
+    TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, UserBusinessesEntity], process.env.CONNECTION_NAME_2),
     AuthModule
   ],
   controllers: [UsersController],
@@ -33,6 +35,7 @@ import 'dotenv/config';
     UserMapper,
     GenerateDigits,
     UserConditions,
+    ArrayFilterHelper,
     UserValidation,
     SendEmail,
     DecryptToken,
@@ -46,8 +49,12 @@ import 'dotenv/config';
     VerificationCodeUserCommandHandler,
     ChangingPasswordUserCommandHandler,
     UpdateProfileUserCommandHandler,
+    BusinessesUserCommandHandler,
+    UpdateBusinessesUserCommandHandler,
+    DeleteBusinessesUserCommandHandler,
     //------ Query Handler
-    GetProfileUserQueryHandler
+    GetProfileUserQueryHandler,
+    GetBusinessesUserQueryHandler
   ],
   exports: [UserRepository]
 })

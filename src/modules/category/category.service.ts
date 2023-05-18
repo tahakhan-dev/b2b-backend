@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { IBusinessTypeCategory, ICreateCategory, IUpdateCategory } from './interface/category.interface';
+import { CreateBusinessCategoryCommand } from './commands/create-business-category.command';
+import { UpdateBusinessCategoryCommand } from './commands/update-business-category.command';
+import { GetBusinessTypeCategoryQuery } from './query/get-business-type-category.query';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { IBusinessTypeCategory } from './interface/category.interface';
-import { GetBusinessTypeCategoryQuery } from './query/get-business-type-category.query';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CategoryService {
@@ -16,6 +18,21 @@ export class CategoryService {
   async getBusinessTypeServiceHandler(): Promise<IBusinessTypeCategory> {
     return await this.queryBus.execute(
       new GetBusinessTypeCategoryQuery()
+    )
+  }
+
+
+  // --------------- post ========================]
+
+  async createBussinessServiceHandler(createCategoryDto: CreateCategoryDto): Promise<ICreateCategory> {
+    return await this.commandBus.execute(
+      new CreateBusinessCategoryCommand(createCategoryDto)
+    )
+  }
+
+  async updateBussinessServiceHandler(updateCategoryDto: UpdateCategoryDto): Promise<IUpdateCategory> {
+    return await this.commandBus.execute(
+      new UpdateBusinessCategoryCommand(updateCategoryDto)
     )
   }
 

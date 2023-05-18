@@ -1,17 +1,18 @@
-import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { JwtModule } from '@nestjs/jwt';
-import { JwtAuthGuard } from './guards/jwt-guard';
+import { UserEntity } from '../users/entities/user.entity';
 import { JwtStrategy } from './guards/jwt-strategy';
+import { JwtAuthGuard } from './guards/jwt-guard';
 import { RolesGuard } from './guards/roles.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserEntity } from '../users/entities/user.entity';
+import { AuthService } from './auth.service';
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import 'dotenv/config';
 
 @Module({
     imports: [
         JwtModule.registerAsync({
             useFactory: async () => ({
-                secret: 'hard_to_guess_secret_123',
+                secret: process.env.JWT_SECRET,
                 signOptions: { expiresIn: '1d' }
             })
         }),

@@ -1,11 +1,16 @@
-import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity";
 import { UserForgetPasswordCodeEntity } from "src/modules/users/entities/user-forgetpassword-verfication.entity";
+import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity";
 import { UserVerificationCodeEntity } from "src/modules/users/entities/user-verfication-code.entity"
+import { UserBusinessesEntity } from "src/modules/users/entities/user-businesses.entity";
 import { UserEntity } from "src/modules/users/entities/user.entity";
 
 // database entities
 const entitiesList = [
-    UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, BusinessTypeCategoryEntity
+    // use module
+    UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, UserBusinessesEntity,
+
+    // category module
+    BusinessTypeCategoryEntity
 ];
 
 

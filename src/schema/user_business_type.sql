@@ -1,4 +1,4 @@
-INSERT INTO user_business_type (name)
+INSERT INTO business_type_category (name)
 VALUES
 ('Auto Accessories'),
 ('Auto Dealers – New'),

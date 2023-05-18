@@ -9,8 +9,6 @@ export class DecryptToken {
     ) { }
 
     decryptUserToken(request: Request): IDecryptWrapper | any {
-        // let request:Request
-        // // const authorizationHeader = request.headers['authorization'].replace('Bearer', '').trim();
 
         const authorizationHeader: string = request.headers['authorization']
         if (authorizationHeader) {

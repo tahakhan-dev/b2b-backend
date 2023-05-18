@@ -1,11 +1,12 @@
-import { Status } from "src/common/enums/status"
+import { BusinessTypeCategoryEntity } from "../entities/business-type-category.entity"
 import { StatusCodes } from "src/common/enums/status-codes"
+import { Status } from "src/common/enums/status"
 
 export interface IBusinessTypeCategory {
-    StatusCode?: StatusCodes,
-    Status: Status
-    Result?: Partial<IBusinessTypeCategoryResult[]>
-    Message?: string
+    statusCode?: StatusCodes,
+    status: Status
+    result?: Partial<IBusinessTypeCategoryResult[]>
+    message?: string
 }
 
 
@@ -16,4 +17,18 @@ export interface IBusinessTypeCategoryResult {
     isDeleted: boolean,
     serverCreatedOn: Date,
     serverUpdatedOn: Date
+}
+
+export interface ICreateCategory {
+    statusCode?: StatusCodes,
+    status: Status
+    result?: Partial<BusinessTypeCategoryEntity[]>
+    message?: string
+}
+
+export interface IUpdateCategory {
+    statusCode?: StatusCodes,
+    status: Status
+    result?: Partial<BusinessTypeCategoryEntity[]>
+    message?: string
 }

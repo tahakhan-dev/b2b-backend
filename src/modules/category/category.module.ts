@@ -1,16 +1,15 @@
-import { Module } from '@nestjs/common';
-import { CategoryService } from './category.service';
-import { CategoryController } from './category.controller';
-import { CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { CreateBusinessCategoryCommandHandler, UpdateBusinessCategoryCommandHandler } from './commands.handler';
 import { BusinessTypeCategoryEntity } from './entities/business-type-category.entity';
-import { DecryptToken } from 'src/common/functions/decrypt-token';
-import { AuthModule } from '../auth/auth.module';
 import { GetBusinessTypeCategoryQueryHandler } from './query.handler';
-import 'dotenv/config';
+import { CategoryController } from './category.controller';
 import { CategoryRepository } from './category.repository';
-import { UserRepository } from '../users/users.repository';
 import { UserEntity } from '../users/entities/user.entity';
+import { CategoryService } from './category.service';
+import { AuthModule } from '../auth/auth.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CqrsModule } from '@nestjs/cqrs';
+import { Module } from '@nestjs/common';
+import 'dotenv/config';
 
 
 @Module({
@@ -26,6 +25,9 @@ import { UserEntity } from '../users/entities/user.entity';
     CategoryRepository,
     // UserRepository,
     // DecryptToken,
+
+    CreateBusinessCategoryCommandHandler,
+    UpdateBusinessCategoryCommandHandler,
 
     //-------------Query------------
     GetBusinessTypeCategoryQueryHandler
