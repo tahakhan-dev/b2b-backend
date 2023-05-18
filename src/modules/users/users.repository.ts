@@ -35,6 +35,7 @@ import { LessThan, Repository } from "typeorm";
 import { Request } from 'express';
 import * as moment from 'moment';
 import 'dotenv/config';
+import { ArrayFilterHelper } from "src/helpers/array-filter.helper";
 
 
 @Injectable()
@@ -65,6 +66,7 @@ export class UserRepository {
         @Inject(SendEmail) private readonly sendEmailService: SendEmail,
         @Inject(UserValidation) private readonly userValidationService: UserValidation,
         @Inject(DecryptToken) private readonly decryptTokenService: DecryptToken,
+        @Inject(ArrayFilterHelper) private readonly arrayFilterService: ArrayFilterHelper,
 
     ) { }
 
@@ -189,11 +191,12 @@ export class UserRepository {
         try {
 
             validationError = this.userValidationService.verficationLinkValidation(verificationLinkUserDto, undefined, undefined); // validating user
-
             if (validationError) return validationError
 
             getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole) // geting user condition
+
             getUser = await this.userRepositoryR.findOne(getUserWhereClause); // finding user
+
 
             validationError = this.userValidationService.verficationLinkValidation(verificationLinkUserDto, getUser, true);
 
@@ -412,7 +415,7 @@ export class UserRepository {
 
     private async signIn(loginUserDto: LoginUserDto): Promise<ILoginUser> {
         let response: ILoginUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUser: UserEntity,
-            validationError: ILoginUser, checkingUserPassword: boolean, usertoken: string;
+            validationError: ILoginUser, checkingUserPassword: boolean, usertoken: string, filterArray;
         try {
 
             getUserWhereClause = this.userCondition.usernameOrEmail(loginUserDto.email, loginUserDto.userName, loginUserDto.role as UserRole);
@@ -427,7 +430,19 @@ export class UserRepository {
             usertoken = await this.authService.generateJWT(getUser);
             getUser.token = usertoken
 
-            response = responseHandler([getUser], "Login Successfully", Status.SUCCESS, StatusCodes.SUCCESS);
+            filterArray = this.arrayFilterService.filterArray([getUser], [
+                'password',
+                'id',
+                'isActive',
+                'isDeleted',
+                'serverCreatedOn',
+                'serverUpdatedOn',
+                'signUpType',
+                'optVerification',
+                'isBlock'
+            ]);
+
+            response = responseHandler(filterArray, "Login Successfully", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
 
@@ -513,14 +528,27 @@ export class UserRepository {
     // ----------------------------------------    GET CALLS LOGICS  ------------------------------------------
 
     private async getUserUpdateProfile(request: Request): Promise<IGetProfileUser> {
-        let response: IGetProfileUser, decryptResponse: IDecryptWrapper, result: Partial<UserEntity[]>;
+        let response: IGetProfileUser, decryptResponse: IDecryptWrapper, result: Partial<UserEntity[]>, filterArray: Partial<UserEntity[]>;
 
         try {
             decryptResponse = this.decryptTokenService.decryptUserToken(request);
 
             result = await this.userRepositoryR.find({ where: { id: decryptResponse.userId } })
 
-            response = responseHandler(result, "Your Profile ", Status.SUCCESS, StatusCodes.SUCCESS);
+            filterArray = this.arrayFilterService.filterArray(result, [
+                'password',
+                'id',
+                'isActive',
+                'isDeleted',
+                'serverCreatedOn',
+                'serverUpdatedOn',
+                'signUpType',
+                'emailVerified',
+                'optVerification',
+                'isBlock'
+            ])
+
+            response = responseHandler(filterArray, "Your Profile ", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
             response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)

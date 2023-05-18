@@ -23,13 +23,13 @@ export class CategoryController {
 
     try {
       const getBusinessType = await this.categoryService.getBusinessTypeServiceHandler();
-      res.status(Number(getBusinessType.StatusCode)).json(getBusinessType)
+      res.status(Number(getBusinessType.statusCode)).json(getBusinessType)
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -46,15 +46,15 @@ export class CategoryController {
     try {
 
       const createdBusinessCategory = await this.categoryService.createBussinessServiceHandler(createCategoryDto);
-      res.status(Number(createdBusinessCategory.StatusCode)).json(createdBusinessCategory)
+      res.status(Number(createdBusinessCategory.statusCode)).json(createdBusinessCategory)
 
     } catch (error) {
 
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -68,15 +68,15 @@ export class CategoryController {
     try {
 
       const updateBusinessCategory = await this.categoryService.updateBussinessServiceHandler(updateCategoryDto);
-      res.status(Number(updateBusinessCategory.StatusCode)).json(updateBusinessCategory)
+      res.status(Number(updateBusinessCategory.statusCode)).json(updateBusinessCategory)
 
     } catch (error) {
 
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }

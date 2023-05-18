@@ -31,15 +31,15 @@ export class UsersController {
     try {
 
       const createdUser = await this.usersService.createUserServiceHandler(createUserDto);  // If the user is successfully created, the response is returned as a JSON object with a status code and the user information. If there is an error, the catch block is executed, and an error response is returned with an error message and a status code of 500 (Internal Server Error).
-      res.status(Number(createdUser.StatusCode)).json(createdUser)
+      res.status(Number(createdUser.statusCode)).json(createdUser)
 
     } catch (error) {
 
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -52,15 +52,15 @@ export class UsersController {
     try {
 
       const loginUser = await this.usersService.LoginUserServiceHandler(loginUserDto);
-      res.status(Number(loginUser.StatusCode)).json(loginUser)
+      res.status(Number(loginUser.statusCode)).json(loginUser)
 
     } catch (error) {
 
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -73,14 +73,14 @@ export class UsersController {
     try {
 
       const ResendVerificationLink = await this.usersService.VerificationLinkUserServiceHandler(verificationLinkUserDto);
-      res.status(Number(ResendVerificationLink.StatusCode)).json(ResendVerificationLink)
+      res.status(Number(ResendVerificationLink.statusCode)).json(ResendVerificationLink)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -92,14 +92,14 @@ export class UsersController {
     try {
 
       const ResendForgetPasswordLink = await this.usersService.resendForgetPasswordLinkUserServiceHandler(resendForgetPasswordLinkUserDto);
-      res.status(Number(ResendForgetPasswordLink.StatusCode)).json(ResendForgetPasswordLink)
+      res.status(Number(ResendForgetPasswordLink.statusCode)).json(ResendForgetPasswordLink)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -111,14 +111,14 @@ export class UsersController {
     try {
 
       const ForgetPasswordCode = await this.usersService.checkingForgetPasswordCodeUserServiceHandler(forgetPasswordCodeUserDto);
-      res.status(Number(ForgetPasswordCode.StatusCode)).json(ForgetPasswordCode)
+      res.status(Number(ForgetPasswordCode.statusCode)).json(ForgetPasswordCode)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -130,14 +130,14 @@ export class UsersController {
     try {
 
       const VerificationCode = await this.usersService.checkingVerificationCodeUserServiceHandler(verificationCodeUserDto);
-      res.status(Number(VerificationCode.StatusCode)).json(VerificationCode)
+      res.status(Number(VerificationCode.statusCode)).json(VerificationCode)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -149,14 +149,14 @@ export class UsersController {
     try {
 
       const ResetPassword = await this.usersService.resetPasswordUserServiceHandler(resetPasswordUserDto);
-      res.status(Number(ResetPassword.StatusCode)).json(ResetPassword)
+      res.status(Number(ResetPassword.statusCode)).json(ResetPassword)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -171,14 +171,14 @@ export class UsersController {
     try {
 
       const ChangingPassword = await this.usersService.changingPasswordUserServiceHandler(changingPasswordUserDto);
-      res.status(Number(ChangingPassword.StatusCode)).json(ChangingPassword)
+      res.status(Number(ChangingPassword.statusCode)).json(ChangingPassword)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -193,14 +193,14 @@ export class UsersController {
     try {
 
       const updateUserProfile = await this.usersService.updateProfileUserServiceHandler(updateUserProfileUserDto, request);
-      res.status(Number(updateUserProfile.StatusCode)).json(updateUserProfile)
+      res.status(Number(updateUserProfile.statusCode)).json(updateUserProfile)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -214,14 +214,14 @@ export class UsersController {
     try {
 
       const addUserBusiness = await this.usersService.addBusinessesUserServiceHandler(addUserBusinessesDto, request);
-      res.status(Number(addUserBusiness.StatusCode)).json(addUserBusiness)
+      res.status(Number(addUserBusiness.statusCode)).json(addUserBusiness)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -235,14 +235,14 @@ export class UsersController {
     try {
 
       const updateUserBusiness = await this.usersService.updateBusinessesUserServiceHandler(updateUserBusinessesDto, request);
-      res.status(Number(updateUserBusiness.StatusCode)).json(updateUserBusiness)
+      res.status(Number(updateUserBusiness.statusCode)).json(updateUserBusiness)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -256,14 +256,14 @@ export class UsersController {
     try {
 
       const deleteUserBusiness = await this.usersService.deleteBusinessesUserServiceHandler(deleteUserBusinessesDto, request);
-      res.status(Number(deleteUserBusiness.StatusCode)).json(deleteUserBusiness)
+      res.status(Number(deleteUserBusiness.statusCode)).json(deleteUserBusiness)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -280,14 +280,14 @@ export class UsersController {
     try {
 
       const getUserProfile = await this.usersService.getProfileUserServiceHandler(request);
-      res.status(Number(getUserProfile.StatusCode)).json(getUserProfile)
+      res.status(Number(getUserProfile.statusCode)).json(getUserProfile)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }
@@ -301,14 +301,14 @@ export class UsersController {
     try {
 
       const getUserBusinesses = await this.usersService.getUserBusinessesServiceHandler(request);
-      res.status(Number(getUserBusinesses.StatusCode)).json(getUserBusinesses)
+      res.status(Number(getUserBusinesses.statusCode)).json(getUserBusinesses)
 
     } catch (error) {
       const response: IResponseWrapper<[]> = {
-        StatusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-        Status: Status.FAILED,
-        Result: null,
-        Message: 'There is some error',
+        statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+        status: Status.FAILED,
+        result: null,
+        message: 'There is some error',
       };
       return response;
     }

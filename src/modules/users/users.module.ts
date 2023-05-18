@@ -18,6 +18,7 @@ import { UsersService } from './users.service';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
 import 'dotenv/config';
+import { ArrayFilterHelper } from 'src/helpers/array-filter.helper';
 
 
 @Module({
@@ -34,6 +35,7 @@ import 'dotenv/config';
     UserMapper,
     GenerateDigits,
     UserConditions,
+    ArrayFilterHelper,
     UserValidation,
     SendEmail,
     DecryptToken,
