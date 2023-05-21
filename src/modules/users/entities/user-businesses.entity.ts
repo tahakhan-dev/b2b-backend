@@ -1,18 +1,18 @@
 import { BusinessTypeCategoryEntity } from "src/modules/category/entities/business-type-category.entity";
 import { BaseEntity } from "src/entitiesList/base.entity";
-import { Column, Entity, JoinColumn, OneToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from "typeorm";
 
 @Entity({ name: 'user_businesses' })
 export class UserBusinessesEntity extends BaseEntity {
     @Column({ name: 'user_id', nullable: false })
     userId: number;
 
-    // @Column({ name: 'business_type_id', nullable: false })
-    // businessTypeId: number;
-
-    @OneToOne((type) => BusinessTypeCategoryEntity, (ref) => ref.id)
+    @ManyToOne(() => BusinessTypeCategoryEntity, { eager: true })
     @JoinColumn({ name: 'business_type_id' })
     businessType: BusinessTypeCategoryEntity;
+
+    // @Column({ name: 'business_type_id', nullable: false })
+    // businessTypeId: number;
 
     @Column({ name: 'business_name', nullable: false })
     businessName: string;

@@ -3,7 +3,6 @@ import { UserRole } from 'src/common/enums/user-role';
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-
 @Injectable()
 export class AuthService {
 
@@ -23,7 +22,6 @@ export class AuthService {
     decodeJWT(authToken: string): Object {
         return this.jwtService.decode(authToken)
     }
-
 
     async hashPassword(password: string): Promise<string> {
         const salt = await bcrypt.genSalt();

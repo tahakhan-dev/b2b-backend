@@ -27,8 +27,9 @@ export class UserMapper {
         userObj.signUpType = data.signUpType as UserSignUpType;
         userObj.phoneNumber = data.phoneNumber;
         userObj.profileImage = data.profileImage;
-        userObj.emailVerified = data && data.signUpType as UserSignUpType == UserSignUpType.CUSTOM &&
-            data.role as UserRole != UserRole.ADMIN ? false : true
+        // userObj.emailVerified = data && data.signUpType as UserSignUpType == UserSignUpType.CUSTOM &&
+        //     data.role as UserRole != UserRole.ADMIN ? false : true
+        userObj.emailVerified = true
 
         return userObj
 

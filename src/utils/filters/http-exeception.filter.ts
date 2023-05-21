@@ -32,7 +32,7 @@ export class HttpExceptionFilter<T> implements ExceptionFilter { // this filter 
         const statusCode = getStatusCode<T>(exception);
         const message = getErrorMessage<T>(exception);
 
-        let ErroResponse = responseHandler(null, message, 0, statusCode == 403 ? StatusCodes.FORBIDDEN : statusCode == 401 ? StatusCodes.UNAUTHORIZED : StatusCodes.INTERNAL_SERVER_ERROR);
+        let ErroResponse = responseHandler(null, message, 0, statusCode == 403 ? StatusCodes.FORBIDDEN : statusCode == 401 ? StatusCodes.UNAUTHORIZED : statusCode == 400 ? StatusCodes.BAD_REQUEST : StatusCodes.INTERNAL_SERVER_ERROR);
 
         response.status(statusCode).json({
             timestamp: new Date().toISOString(),

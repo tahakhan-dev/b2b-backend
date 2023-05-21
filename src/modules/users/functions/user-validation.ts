@@ -24,6 +24,8 @@ export class UserValidation {
             return responseHandler(null, "Verfication Link can't be sent to admin", Status.FAILED, StatusCodes.FORBIDDEN)
         if (verificationLinkUserDto && verificationLinkUserDto?.signUpType as UserSignUpType != UserSignUpType.CUSTOM)
             return responseHandler(null, "Verfication Link can't be sent to socail Sign UP user", Status.FAILED, StatusCodes.FORBIDDEN);
+            if (!getUser && exists)
+            return responseHandler(null, "This User Does not Exists", Status.FAILED, StatusCodes.NOT_FOUND);
         if (getUser && getUser?.emailVerified == true && exists == true) return responseHandler(null, "You Email is already verified ", Status.SUCCESS, StatusCodes.SUCCESS)
 
     }

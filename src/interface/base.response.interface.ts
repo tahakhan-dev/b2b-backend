@@ -2,10 +2,10 @@ import { UserRole } from "src/common/enums/user-role";
 import { StatusCodes } from "../common/enums/status-codes";
 
 export interface IResponseWrapper<T> {
-    StatusCode: StatusCodes;
-    Result?: Partial<T>;
-    Status: number,
-    Message: string;
+    statusCode: StatusCodes;
+    result?: Partial<T>;
+    status: number,
+    message: string;
 }
 
 export interface IDecryptWrapper {

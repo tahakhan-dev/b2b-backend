@@ -10,6 +10,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Module } from '@nestjs/common';
 import 'dotenv/config';
+import { RedisModule } from '../redis/redis.module';
 
 
 @Module({
@@ -18,6 +19,7 @@ import 'dotenv/config';
     TypeOrmModule.forFeature([BusinessTypeCategoryEntity]),
     TypeOrmModule.forFeature([BusinessTypeCategoryEntity, UserEntity], process.env.CONNECTION_NAME_2),
     AuthModule,
+    RedisModule,
   ],
   controllers: [CategoryController],
   providers: [

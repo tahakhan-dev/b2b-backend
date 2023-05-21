@@ -16,12 +16,14 @@ import { GenerateDigits } from "src/common/functions/generate-digits";
 import { UserConditions } from "src/common/functions/user-condition";
 import { ResetPasswordUserDto } from "./dto/reset-password-user.dto";
 import { AddUserBusinessesDto } from "./dto/add-user-businesses.dto";
-import { DecryptToken } from "src/common/functions/decrypt-token";
+import { ArrayFilterHelper } from "src/helpers/array-filter.helper";
+import { TokenFunctions } from "src/common/functions/token-generic-function";
 import { responseHandler } from "src/helpers/response-handler";
 import { StatusCodes } from "../../common/enums/status-codes";
 import { UserSignUpType } from "src/common/enums/signup-type";
 import { UserValidation } from "./functions/user-validation";
 import { SendEmail } from "src/helpers/send-email.helper";
+import { RedisService } from "../redis/redis.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserRole } from "src/common/enums/user-role";
 import { UserEntity } from "./entities/user.entity";
@@ -60,11 +62,13 @@ export class UserRepository {
 
         @Inject(UserMapper) private readonly mapper: UserMapper,
         @Inject(AuthService) private readonly authService: AuthService,
+        @Inject(RedisService) private readonly redisService: RedisService,
         @Inject(GenerateDigits) private readonly randomDigit: GenerateDigits,
         @Inject(UserConditions) private readonly userCondition: UserConditions,
         @Inject(SendEmail) private readonly sendEmailService: SendEmail,
         @Inject(UserValidation) private readonly userValidationService: UserValidation,
-        @Inject(DecryptToken) private readonly decryptTokenService: DecryptToken,
+        @Inject(TokenFunctions) private readonly tokenService: TokenFunctions,
+        @Inject(ArrayFilterHelper) private readonly arrayFilterService: ArrayFilterHelper,
 
     ) { }
 
@@ -118,8 +122,8 @@ export class UserRepository {
     }
 
     // -------------------- get calls-----------------------------
-    async getUpdateProfile(request: Request): Promise<any> {
-        return await this.getUserUpdateProfile(request)
+    async getUserProfile(request: Request): Promise<any> {
+        return await this.getProfileUser(request)
     }
 
     async getUserBusinesses(request: Request): Promise<any> {
@@ -189,11 +193,12 @@ export class UserRepository {
         try {
 
             validationError = this.userValidationService.verficationLinkValidation(verificationLinkUserDto, undefined, undefined); // validating user
-
             if (validationError) return validationError
 
             getUserWhereClause = this.userCondition.usernameOrEmail(verificationLinkUserDto.email, undefined, verificationLinkUserDto.role as UserRole) // geting user condition
+
             getUser = await this.userRepositoryR.findOne(getUserWhereClause); // finding user
+
 
             validationError = this.userValidationService.verficationLinkValidation(verificationLinkUserDto, getUser, true);
 
@@ -412,7 +417,7 @@ export class UserRepository {
 
     private async signIn(loginUserDto: LoginUserDto): Promise<ILoginUser> {
         let response: ILoginUser, getUserWhereClause: IUserSearchOptionsByUserNameOrEmail, getUser: UserEntity,
-            validationError: ILoginUser, checkingUserPassword: boolean, usertoken: string;
+            validationError: ILoginUser, checkingUserPassword: boolean, usertoken: string, filterArray;
         try {
 
             getUserWhereClause = this.userCondition.usernameOrEmail(loginUserDto.email, loginUserDto.userName, loginUserDto.role as UserRole);
@@ -427,7 +432,21 @@ export class UserRepository {
             usertoken = await this.authService.generateJWT(getUser);
             getUser.token = usertoken
 
-            response = responseHandler([getUser], "Login Successfully", Status.SUCCESS, StatusCodes.SUCCESS);
+            this.redisService.addUserProfileValueToRedis(getUser.id, getUser)
+
+            filterArray = this.arrayFilterService.filterArray([getUser], [
+                'password',
+                'id',
+                'isActive',
+                'isDeleted',
+                'serverCreatedOn',
+                'serverUpdatedOn',
+                'signUpType',
+                'optVerification',
+                'isBlock'
+            ]);
+
+            response = responseHandler(filterArray, "Login Successfully", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
 
@@ -447,7 +466,7 @@ export class UserRepository {
         let response: IUpdateProfileUser, decryptResponse: IDecryptWrapper;
         try {
 
-            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            decryptResponse = this.tokenService.decryptUserToken(request);
             await this.userRepositoryW.update({ id: decryptResponse.userId }, updateUserProfileUserDto)
             response = responseHandler(null, "Your Profile Is Updated ", Status.SUCCESS, StatusCodes.SUCCESS);
 
@@ -461,7 +480,7 @@ export class UserRepository {
         let response: IAddBusinessUser, decryptResponse: IDecryptWrapper, userBusinessMapper: UserBusinessesEntity;
         try {
 
-            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            decryptResponse = this.tokenService.decryptUserToken(request);
             userBusinessMapper = this.mapper.createUserBusinessObj(decryptResponse, addUserBusinessesDto);
 
             await this.UserBusinessesRepositoryW.save(userBusinessMapper)
@@ -478,7 +497,7 @@ export class UserRepository {
         let response: IUpdateBusinessUser, updateUserBusinessMapper: UserBusinessesEntity, decryptResponse: IDecryptWrapper, updateByUserIdAndId: IUpdateByIdAndUserId;
         try {
 
-            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            decryptResponse = this.tokenService.decryptUserToken(request);
             updateUserBusinessMapper = this.mapper.UpdateUserBusinessObj(updateUserBusinessesDto);
             updateByUserIdAndId = this.userCondition.updateByIdAndUserId(updateUserBusinessesDto.id, decryptResponse.userId)
 
@@ -496,7 +515,7 @@ export class UserRepository {
         let response: IUpdateBusinessUser, decryptResponse: IDecryptWrapper, updateByUserIdAndId: IUpdateByIdAndUserId, isDeleted: IDeleteConditon;
         try {
 
-            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            decryptResponse = this.tokenService.decryptUserToken(request);
             updateByUserIdAndId = this.userCondition.updateByIdAndUserId(deleteUserBusinessesDto.id, decryptResponse.userId)
             isDeleted = this.userCondition.deleteCondition()
 
@@ -512,15 +531,35 @@ export class UserRepository {
 
     // ----------------------------------------    GET CALLS LOGICS  ------------------------------------------
 
-    private async getUserUpdateProfile(request: Request): Promise<IGetProfileUser> {
-        let response: IGetProfileUser, decryptResponse: IDecryptWrapper, result: Partial<UserEntity[]>;
+    private async getProfileUser(request: Request): Promise<IGetProfileUser> {
+        let response: IGetProfileUser, decryptResponse: IDecryptWrapper, result: Partial<UserEntity>, filterArray: any, redisGetProfile: Partial<UserEntity>, consumerToken: string | boolean
 
         try {
-            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            decryptResponse = this.tokenService.decryptUserToken(request);
+            consumerToken = this.tokenService.getUserToken(request)
 
-            result = await this.userRepositoryR.find({ where: { id: decryptResponse.userId } })
+            if (consumerToken) redisGetProfile = await this.redisService.getUserProfileFromRedis(decryptResponse.userId);
 
-            response = responseHandler(result, "Your Profile ", Status.SUCCESS, StatusCodes.SUCCESS);
+            result = redisGetProfile ? redisGetProfile : await this.userRepositoryR.findOne({ where: { id: decryptResponse.userId } })
+            result.token = consumerToken as string
+                        
+            if (!redisGetProfile && consumerToken) await this.redisService.addUserProfileValueToRedis(decryptResponse.userId, result);
+
+            filterArray = this.arrayFilterService.filterArray([result], [
+                'password',
+                'id',
+                'isActive',
+                'isDeleted',
+                'serverCreatedOn',
+                'serverUpdatedOn',
+                'signUpType',
+                'emailVerified',
+                'optVerification',
+                'isBlock',
+                'token'
+            ])
+
+            response = responseHandler(filterArray, "Your Profile ", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
             response = responseHandler(null, error?.message, Status.FAILED, StatusCodes.INTERNAL_SERVER_ERROR)
@@ -532,7 +571,7 @@ export class UserRepository {
     private async getBusinessesUser(request: Request): Promise<IGetBusinessesUser> {
         let response: IGetBusinessesUser, decryptResponse: IDecryptWrapper, result: Partial<GetBusinessUserResult[]>;
         try {
-            decryptResponse = this.decryptTokenService.decryptUserToken(request);
+            decryptResponse = this.tokenService.decryptUserToken(request);
             result = await this.UserBusinessesRepositoryR.find({
                 where: { userId: decryptResponse.userId },
                 relations: ['businessType']
