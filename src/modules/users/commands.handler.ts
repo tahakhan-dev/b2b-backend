@@ -40,8 +40,7 @@ export class VerificationLinkUserCommandHandler implements ICommandHandler<Verif
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: VerificationLinkUserCommand, resolve: (value?) => void): Promise<IVerificationLinkUser> {
+    async execute(command: VerificationLinkUserCommand): Promise<IVerificationLinkUser> {
         const verificationLink = this.publisher.mergeObjectContext(
             await this.userRepo.sendVerificationLinkUser(command.verificationLinkUserDto),
         );
@@ -56,8 +55,7 @@ export class ResendForgetPasswordLinkUserCommandHandler implements ICommandHandl
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: ResendForgetPasswordLinkCommand, resolve: (value?) => void): Promise<IVerificationLinkUser> {
+    async execute(command: ResendForgetPasswordLinkCommand): Promise<IVerificationLinkUser> {
         const resendForgetPasswordLink = this.publisher.mergeObjectContext(
             await this.userRepo.resendForgetPasswordLinkUser(command.resendForgetPasswordLinkUserDto),
         );
@@ -72,8 +70,7 @@ export class ForgetPasswordCodeUserCommandHandler implements ICommandHandler<For
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: ForgetPasswordCodeUserCommand, resolve: (value?) => void): Promise<IForgetPasswordCodeUser> {
+    async execute(command: ForgetPasswordCodeUserCommand): Promise<IForgetPasswordCodeUser> {
         const forgetPassword = this.publisher.mergeObjectContext(
             await this.userRepo.forgetPasswordCodeUser(command.forgetPasswordCodeUserDto),
         );
@@ -88,8 +85,7 @@ export class VerificationCodeUserCommandHandler implements ICommandHandler<Verif
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: VerificationCodeUserCommand, resolve: (value?) => void): Promise<IVerificationCodeUser> {
+    async execute(command: VerificationCodeUserCommand): Promise<IVerificationCodeUser> {
         const verificationCode = this.publisher.mergeObjectContext(
             await this.userRepo.verificationCodeUser(command.verificationCodeUserDto),
         );
@@ -104,8 +100,7 @@ export class ResetPasswordUserCommandHandler implements ICommandHandler<ResetPas
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: ResetPasswordUserCommand, resolve: (value?) => void): Promise<IResetPasswordUser> {
+    async execute(command: ResetPasswordUserCommand): Promise<IResetPasswordUser> {
         const resetPassword = this.publisher.mergeObjectContext(
             await this.userRepo.resetPasswordUser(command.resetPasswordUserDto),
         );
@@ -120,8 +115,8 @@ export class ChangingPasswordUserCommandHandler implements ICommandHandler<Chang
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: ChangingPasswordUserCommand, resolve: (value?) => void): Promise<IChangingPasswordUser> {
+
+    async execute(command: ChangingPasswordUserCommand): Promise<IChangingPasswordUser> {
         const changingPassword = this.publisher.mergeObjectContext(
             await this.userRepo.changingPasswordUser(command.changingPasswordUserDto),
         );
@@ -136,8 +131,7 @@ export class LoginUserCommandHandler implements ICommandHandler<LoginUserCommand
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: LoginUserCommand, resolve: (value?) => void): Promise<ILoginUser> {
+    async execute(command: LoginUserCommand): Promise<ILoginUser> {
         const loginUser = this.publisher.mergeObjectContext(
             await this.userRepo.loginUser(command.LoginUserDto),
         );
@@ -152,8 +146,7 @@ export class UpdateProfileUserCommandHandler implements ICommandHandler<UpdatePr
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: UpdateProfileUserCommand, resolve: (value?) => void): Promise<IUpdateProfileUser> {
+    async execute(command: UpdateProfileUserCommand): Promise<IUpdateProfileUser> {
         const updateProfile = this.publisher.mergeObjectContext(
             await this.userRepo.updateProfile(command.updateUserProfileUserDto, command.request),
         );
@@ -168,8 +161,8 @@ export class BusinessesUserCommandHandler implements ICommandHandler<AddBusiness
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: AddBusinessesUserCommand, resolve: (value?) => void): Promise<IAddBusinessUser> {
+
+    async execute(command: AddBusinessesUserCommand): Promise<IAddBusinessUser> {
         const addUserBusiness = this.publisher.mergeObjectContext(
             await this.userRepo.addBusinessesUser(command.addUserBusinessesDto, command.request),
         );
@@ -184,8 +177,7 @@ export class UpdateBusinessesUserCommandHandler implements ICommandHandler<Updat
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: UpdateBusinessesUserCommand, resolve: (value?) => void): Promise<IUpdateBusinessUser> {
+    async execute(command: UpdateBusinessesUserCommand): Promise<IUpdateBusinessUser> {
         const updateUserBusiness = this.publisher.mergeObjectContext(
             await this.userRepo.updateBusinessesUser(command.updateUserBusinessesDto, command.request),
         );
@@ -200,8 +192,7 @@ export class DeleteBusinessesUserCommandHandler implements ICommandHandler<Delet
         private readonly publisher: EventPublisher,
     ) { }
 
-    // @ts-ignore
-    async execute(command: DeleteBusinessesUserCommand, resolve: (value?) => void): Promise<IDeleteBusinessUser> {
+    async execute(command: DeleteBusinessesUserCommand): Promise<IDeleteBusinessUser> {
         const deleteUserBusiness = this.publisher.mergeObjectContext(
             await this.userRepo.deleteBusinessesUser(command.deleteUserBusinessesDto, command.request),
         );

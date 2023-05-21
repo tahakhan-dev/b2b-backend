@@ -1,5 +1,5 @@
 import { MicroServiceHealthCheckService } from './microservice-health-check.service';
-import { DatabaseModule } from './modules/databaseModule/database/database.module';
+import { DatabaseModule } from './modules/database/connection/database.module';
 import { CalculationProcessor } from './utils/workerThreads/calculation.processor';
 import { LoggingInterceptor } from './utils/interceptor/logging.interceptor';
 import { HttpExceptionFilter } from './utils/filters/http-exeception.filter';
@@ -29,6 +29,8 @@ import { BullModule } from '@nestjs/bull';
     BullModule.registerQueue({
       name: 'calculation',
     }),
+
+    
 
     MailerModule.forRoot({
       transport: {
