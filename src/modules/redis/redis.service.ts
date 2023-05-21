@@ -1,9 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { IBusinessTypeCategoryResult } from '../category/interface/category.interface';
+import { UserEntity } from '../users/entities/user.entity';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager'
 import 'dotenv/config';
-import { UserEntity } from '../users/entities/user.entity';
-import { IBusinessTypeCategoryResult } from '../category/interface/category.interface';
 
 @Injectable()
 export class RedisService {
@@ -13,9 +13,6 @@ export class RedisService {
     async addUserProfileValueToRedis(key: number, value: Partial<UserEntity>): Promise<boolean> {
         try {
             let profileUserProfileKey: string, redisResponse: any;
-
-            console.log(value, '======value================');
-
 
             profileUserProfileKey = `${process.env.REDIS_USER_PROFILE_KEY_PREFIX}-${key}`
             redisResponse = await this.cacheManager.set(profileUserProfileKey, value)
@@ -45,9 +42,6 @@ export class RedisService {
     async addBusinessCategoryValueToRedis(key: number, value: IBusinessTypeCategoryResult[]): Promise<boolean> {
         try {
             let businessCategoryKey: string, redisResponse: any;
-
-            console.log(value);
-
 
             businessCategoryKey = `${process.env.REDIS_BUSINESS_CATEGORY_KEY_PREFIX}-${key}`
             redisResponse = await this.cacheManager.set(businessCategoryKey, value)

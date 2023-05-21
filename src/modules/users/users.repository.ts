@@ -542,8 +542,7 @@ export class UserRepository {
 
             result = redisGetProfile ? redisGetProfile : await this.userRepositoryR.findOne({ where: { id: decryptResponse.userId } })
             result.token = consumerToken as string
-            console.log(result,'======result=============');
-            
+                        
             if (!redisGetProfile && consumerToken) await this.redisService.addUserProfileValueToRedis(decryptResponse.userId, result);
 
             filterArray = this.arrayFilterService.filterArray([result], [
