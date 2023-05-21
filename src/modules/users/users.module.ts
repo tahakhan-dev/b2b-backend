@@ -5,7 +5,7 @@ import { UserVerificationCodeEntity } from './entities/user-verfication-code.ent
 import { UserBusinessesEntity } from './entities/user-businesses.entity';
 import { GenerateDigits } from 'src/common/functions/generate-digits';
 import { UserConditions } from 'src/common/functions/user-condition';
-import { DecryptToken } from 'src/common/functions/decrypt-token';
+import { TokenFunctions } from 'src/common/functions/token-generic-function';
 import { UserValidation } from './functions/user-validation';
 import { SendEmail } from 'src/helpers/send-email.helper';
 import { UsersController } from './users.controller';
@@ -16,9 +16,11 @@ import { AuthModule } from '../auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { CqrsModule } from '@nestjs/cqrs';
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import 'dotenv/config';
 import { ArrayFilterHelper } from 'src/helpers/array-filter.helper';
+import { AuthenticationMiddleware } from 'src/middleware/authentication.middleware';
+import { RedisModule } from '../redis/redis.module';
 
 
 @Module({
@@ -26,7 +28,8 @@ import { ArrayFilterHelper } from 'src/helpers/array-filter.helper';
     CqrsModule,
     TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, UserBusinessesEntity]),
     TypeOrmModule.forFeature([UserEntity, UserVerificationCodeEntity, UserForgetPasswordCodeEntity, UserBusinessesEntity], process.env.CONNECTION_NAME_2),
-    AuthModule
+    AuthModule,
+    RedisModule
   ],
   controllers: [UsersController],
   providers: [
@@ -38,7 +41,7 @@ import { ArrayFilterHelper } from 'src/helpers/array-filter.helper';
     ArrayFilterHelper,
     UserValidation,
     SendEmail,
-    DecryptToken,
+    TokenFunctions,
     // ---- Command Handler
     CreateUserCommandHandler,
     LoginUserCommandHandler,
@@ -58,4 +61,8 @@ import { ArrayFilterHelper } from 'src/helpers/array-filter.helper';
   ],
   exports: [UserRepository]
 })
-export class UsersModule { }
+export class UsersModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthenticationMiddleware).forRoutes('*');
+  }
+}

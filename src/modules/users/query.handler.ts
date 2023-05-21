@@ -15,7 +15,7 @@ export class GetProfileUserQueryHandler implements IQueryHandler<GetProfileUserQ
     // @ts-ignore
     async execute(query: GetProfileUserQuery, resolve: (value?) => void): Promise<IGetProfileUser> {
         const getProfileDetail = this.publisher.mergeObjectContext(
-            await this.userRepo.getUpdateProfile(query.request),
+            await this.userRepo.getUserProfile(query.request),
         );
         return getProfileDetail;
     }

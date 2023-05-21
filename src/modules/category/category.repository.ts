@@ -4,9 +4,10 @@ import { responseHandler } from "src/helpers/response-handler";
 import { CreateCategoryDto } from "./dto/create-category.dto";
 import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { StatusCodes } from "src/common/enums/status-codes";
+import { RedisService } from "../redis/redis.service";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Status } from "src/common/enums/status";
-import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import 'dotenv/config';
 
@@ -18,6 +19,8 @@ export class CategoryRepository {
         private readonly BusinessTypeCategoryRepositoryw: Repository<BusinessTypeCategoryEntity>,
         @InjectRepository(BusinessTypeCategoryEntity, process.env.CONNECTION_NAME_2)
         private readonly BusinessTypeCategoryRepositoryR: Repository<BusinessTypeCategoryEntity>,
+        @Inject(RedisService) private readonly redisService: RedisService,
+
     ) { }
 
     async businessTypeCategory(): Promise<any> {
@@ -33,15 +36,15 @@ export class CategoryRepository {
     }
 
 
-
-
-
     private async getBusinessTypeCategory(): Promise<IBusinessTypeCategory> {
         let response: IBusinessTypeCategory, result: Partial<IBusinessTypeCategoryResult[]>;
 
         try {
+            let redisCategoryResponse = await this.redisService.getBusinessCategoryFromRedis(1)
+            result = redisCategoryResponse ? [redisCategoryResponse] : await this.BusinessTypeCategoryRepositoryR.find()
 
-            result = await this.BusinessTypeCategoryRepositoryR.find()
+            if (!redisCategoryResponse) await this.redisService.addBusinessCategoryValueToRedis(1, result)
+
             response = responseHandler(result, "Business Type Category", Status.SUCCESS, StatusCodes.SUCCESS);
 
         } catch (error) {
