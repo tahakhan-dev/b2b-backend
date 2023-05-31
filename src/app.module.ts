@@ -11,9 +11,10 @@ import { UsersModule } from './modules/users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ShutdownService } from './shutdown.service';
 import { AppController } from './app.controller';
-import { Module, Scope } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod, Scope } from '@nestjs/common';
 import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bull';
+import { CompressionMiddleware } from './middleware/compression.middleware';
 
 
 @Module({
@@ -30,7 +31,7 @@ import { BullModule } from '@nestjs/bull';
       name: 'calculation',
     }),
 
-    
+
 
     MailerModule.forRoot({
       transport: {
@@ -64,4 +65,10 @@ import { BullModule } from '@nestjs/bull';
       useClass: HttpExceptionFilter,
     },],
 })
-export class AppModule { }
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(CompressionMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}
