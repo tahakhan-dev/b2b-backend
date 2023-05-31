@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { MemoryStore } from 'express-rate-limit';
 import helmet from "helmet";
+import * as cors from 'cors';
 
 
 
@@ -11,6 +12,9 @@ async function bootstrap() {
   const APP_PORT = process.env.PORT
 
   const app = await NestFactory.create(AppModule);
+
+  // Enable CORS
+  app.use(cors());
 
   app.use(helmet());
 
@@ -27,7 +31,8 @@ async function bootstrap() {
     rateLimit({
       windowMs: 5 * 60 * 1000, // 5 minutes
       max: 100, // limit each IP to 100 requests per windowMs,
-      message: "Too many request created from this IP, please try again after an 5 minutes"
+      message: "Too many request created from this IP, please try again after an 5 minutes",
+      store: new MemoryStore(),
     }),
   );
 
